@@ -22,6 +22,8 @@ The execution surfaces under `src/features/` provide:
 
 Task execution is exposed through `src/lib/agent/workspaceTools.ts` and `agentRunner.ts`. The model bridge advertises four bounded tools — `read_file`, `write_file`, `list_files`, and `execute_command` — and runs at most five tool rounds per request. Completed turns are written to the virtual `.agent_state.json` file in IndexedDB, then the workspace is refreshed so the preview sees changes immediately. The floating action bar on Workspace accepts natural-language tasks and routes them through the active configured provider.
 
+The in-browser verification boundary under `src/lib/testing/` provides virtual smoke checks, lightweight TypeScript delimiter/syntax verification, and executable `.test.js` assertion files from IndexedDB. Each AI tool operation triggers a new Test Matrix result in the Terminal tab. `autoCorrector.ts` feeds failed logs back into the agent for up to three corrective iterations, with pass/fail indicators, stack traces, and verification logs visible in the matrix.
+
 ## Development
 
 ```bash

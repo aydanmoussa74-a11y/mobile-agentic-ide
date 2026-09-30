@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { runVirtualCommand as runSharedVirtualCommand } from "./virtualCommands";
 import { createDirectory, deleteDirectory, deleteFile, listDirectories, listFiles, readFile } from "../../lib/storage";
+import { TestMatrix } from "./TestMatrix";
+import type { TestRunResult } from "../../lib/testing/testRunner";
 
-interface VirtualTerminalProps { onWorkspaceChange: () => Promise<void> | void; }
+interface VirtualTerminalProps { onWorkspaceChange: () => Promise<void> | void; testResult: TestRunResult | null; testsRunning: boolean; onRunTests: () => void; }
 interface TerminalLine { kind: "command" | "output" | "error"; text: string; }
 
-export function VirtualTerminal({ onWorkspaceChange }: VirtualTerminalProps) {
+export function VirtualTerminal({ onWorkspaceChange, testResult, testsRunning, onRunTests }: VirtualTerminalProps) {
   const [lines, setLines] = useState<TerminalLine[]>([{ kind: "output", text: "Mobile Agentic IDE terminal · type help for commands" }]);
   const [command, setCommand] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -40,6 +42,7 @@ export function VirtualTerminal({ onWorkspaceChange }: VirtualTerminalProps) {
         <label htmlFor="terminal-command">Command</label>
         <div className="input-row"><span className="terminal-prompt" aria-hidden="true">$</span><input ref={inputRef} id="terminal-command" value={command} onChange={(event) => setCommand(event.target.value)} placeholder="ls" autoComplete="off" autoCapitalize="none" spellCheck={false} /><button className="primary-button" type="submit">Run</button></div>
       </form>
+      <TestMatrix result={testResult} running={testsRunning} onRun={onRunTests} />
       <p className="scope-note">Commands: ls · cat · mkdir · rm · node run · git status</p>
     </section>
   );
