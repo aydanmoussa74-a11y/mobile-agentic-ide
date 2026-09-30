@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Mobile Agentic IDE</title>
+  <desc id="desc">A dark square icon with a cyan agent prompt mark.</desc>
+  <rect width="512" height="512" rx="112" fill="#10131a"/>
+  <path d="M134 166h244v180H134z" fill="none" stroke="#75e6da" stroke-width="28" stroke-linejoin="round"/>
+  <path d="m190 226 54 30-54 30M274 286h54" fill="none" stroke="#f1f5f9" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
