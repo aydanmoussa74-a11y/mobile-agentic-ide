@@ -24,6 +24,8 @@ Task execution is exposed through `src/lib/agent/workspaceTools.ts` and `agentRu
 
 The in-browser verification boundary under `src/lib/testing/` provides virtual smoke checks, lightweight TypeScript delimiter/syntax verification, and executable `.test.js` assertion files from IndexedDB. Each AI tool operation triggers a new Test Matrix result in the Terminal tab. `autoCorrector.ts` feeds failed logs back into the agent for up to three corrective iterations, with pass/fail indicators, stack traces, and verification logs visible in the matrix.
 
+The PWA shell uses `src/sw.ts` as the service-worker source and `public/sw.js` as the static production asset. The worker precaches the app shell, manifest, icon, robots file, and discovers the generated Vite bundle URLs from the built HTML. Static same-origin requests are cached for offline reloads, while IndexedDB remains the cloud-free source of truth for workspace state. Workspace also creates/maintains a portable `.agent_state.json` ledger and provides a dependency-free Complete Project ZIP export. One-Tap Handover includes that ledger file, all local files, and the latest Test Matrix logs in the structured payload.
+
 ## Development
 
 ```bash

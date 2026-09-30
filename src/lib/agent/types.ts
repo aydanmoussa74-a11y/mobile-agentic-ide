@@ -31,6 +31,7 @@ export interface HandoverContext {
   files: VirtualFile[];
   diffs: CodeDiff[];
   sessionHistory: SessionHistoryEntry[];
+  recentTestLogs?: string[];
 }
 
 export interface ModelMessage {

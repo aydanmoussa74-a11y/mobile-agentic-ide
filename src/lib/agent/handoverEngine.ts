@@ -45,8 +45,9 @@ export function createContext(
   files: VirtualFile[],
   diffs: CodeDiff[] = [],
   sessionHistory: SessionHistoryEntry[] = [],
+  recentTestLogs: string[] = [],
 ): HandoverContext {
-  return { agentState, files, diffs, sessionHistory };
+  return { agentState, files, diffs, sessionHistory, recentTestLogs };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
