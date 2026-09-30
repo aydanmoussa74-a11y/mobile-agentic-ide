@@ -2,9 +2,9 @@
 
 A **mobile-first agentic development environment** built as a lightweight PWA foundation. This repository is structurally inspired by [odysseus-dev/odysseus](https://github.com/odysseus-dev/odysseus), while adapting its workspace and agent-handover direction for touch-first interaction, constrained memory, and fast future session transitions.
 
-## Baseline scope
+## Current scope
 
-This first scaffold intentionally contains only the runnable application shell: a mobile-safe viewport, semantic workspace surface, install metadata, a small runtime capability boundary, and reserved feature boundaries for future agent handovers. It does **not** include model providers, authentication, a code editor, IndexedDB persistence, streaming, or a production service worker.
+The app includes a mobile-safe workspace shell and a device-local virtual file system backed by IndexedDB. Files can be created, opened, edited, saved, deleted, and listed without a server; they remain available after a browser reload in the same origin. Model providers, authentication, streaming handovers, a full code editor, and production offline synchronization remain future slices.
 
 ## Development
 
@@ -16,4 +16,4 @@ npm run build
 npm run preview
 ```
 
-The shell uses React, TypeScript, and Vite. The next implementation step is to define the session and handover state model before adding persistence or model integrations.
+Storage entry points live under `src/lib/storage/`. `indexedDbFileSystem.ts` owns the database boundary and exposes `createFile`, `readFile`, `updateFile`, `deleteFile`, and `listTree`; the React workspace uses the same service without coupling UI state to IndexedDB details.
