@@ -47,6 +47,11 @@ textarea { min-height: 180px; resize: vertical; padding: 14px; font-family: ui-m
 .ledger-state { display: grid; gap: 12px; margin: 24px 0; }
 .ledger-state strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #f8fafc; font-size: 0.95rem; }
 .handover-button { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 24px; padding: 0 18px; color: #0f1720; background: var(--accent); font-weight: 800; }
+.agent-action-bar { position: sticky; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 2; margin-top: 24px; padding: 14px; border: 1px solid rgba(117, 230, 218, 0.35); border-radius: 18px; background: rgba(26, 34, 48, 0.96); box-shadow: 0 12px 34px rgba(0, 0, 0, 0.28); backdrop-filter: blur(16px); }
+.agent-action-bar label { display: block; margin-bottom: 8px; color: #dbeafe; font-size: 0.82rem; font-weight: 700; }
+.agent-suggestions { display: flex; gap: 8px; margin-top: 8px; overflow-x: auto; }
+.agent-suggestions button { min-height: 40px; padding: 0 12px; border: 1px solid var(--border); border-radius: 10px; color: var(--text-muted); background: transparent; white-space: nowrap; cursor: pointer; }
+.agent-output { margin: 12px 0 0; color: #d1fae5; font-size: 0.88rem; line-height: 1.5; white-space: pre-wrap; }
 .terminal-output { min-height: 260px; max-height: 48dvh; overflow: auto; margin-top: 24px; padding: 16px; border: 1px solid var(--border); border-radius: 16px; color: #d1fae5; background: #080d12; font: 0.84rem/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
 .terminal-line + .terminal-line { margin-top: 5px; }
 .terminal-command { color: var(--accent); }

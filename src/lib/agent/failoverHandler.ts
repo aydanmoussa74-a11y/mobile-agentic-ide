@@ -1,5 +1,5 @@
 import { callModel } from "./multiModelBridge";
-import type { ModelMessage, ModelResponse, ModelState, ProviderConfig, ProviderId } from "./types";
+import type { ModelMessage, ModelResponse, ModelState, ProviderConfig, ProviderId, ToolDefinition } from "./types";
 
 export interface FailoverResult {
   response: ModelResponse;
@@ -12,6 +12,7 @@ export async function callWithFailover(
   messages: ModelMessage[],
   activeProviderId: ProviderId,
   onStateChange?: (state: ModelState) => void,
+  tools?: ToolDefinition[],
 ): Promise<FailoverResult> {
   const ordered = rotateProviders(providers, activeProviderId);
   const attemptedProviders: ProviderId[] = [];
@@ -21,7 +22,7 @@ export async function callWithFailover(
     attemptedProviders.push(provider.id);
     onStateChange?.({ providerId: provider.id, model: provider.model, activity: "working", configured: Boolean(provider.apiKey), failoverCount: index });
     try {
-      const response = await callModel({ config: provider, messages });
+      const response = await callModel({ config: provider, messages, tools });
       const state: ModelState = { providerId: provider.id, model: provider.model, activity: "ready", configured: true, failoverCount: index };
       onStateChange?.(state);
       return { response, state, attemptedProviders };

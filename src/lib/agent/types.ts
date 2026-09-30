@@ -34,8 +34,22 @@ export interface HandoverContext {
 }
 
 export interface ModelMessage {
-  role: "system" | "user" | "assistant";
+  role: "system" | "user" | "assistant" | "tool";
   content: string;
+  name?: string;
+  toolCallId?: string;
+}
+
+export interface ToolDefinition {
+  name: "read_file" | "write_file" | "list_files" | "execute_command";
+  description: string;
+  parameters: Record<string, unknown>;
+}
+
+export interface ToolCall {
+  id: string;
+  name: ToolDefinition["name"];
+  arguments: Record<string, unknown>;
 }
 
 export interface HandoverPromptPayload {
@@ -65,6 +79,7 @@ export interface ModelState {
 export interface ModelRequest {
   config: ProviderConfig;
   messages: ModelMessage[];
+  tools?: ToolDefinition[];
   signal?: AbortSignal;
 }
 
@@ -72,6 +87,7 @@ export interface ModelResponse {
   providerId: ProviderId;
   model: string;
   text: string;
+  toolCalls?: ToolCall[];
   raw: unknown;
 }
 

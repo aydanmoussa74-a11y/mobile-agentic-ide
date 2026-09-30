@@ -20,6 +20,8 @@ The execution surfaces under `src/features/` provide:
 - `terminal/VirtualTerminal.tsx` — touch-friendly `ls`, `cat`, `mkdir`, `rm`, `node run`, and `git status` commands against IndexedDB. `node run` captures console output in a local virtual runtime; it is not a server-side Node process.
 - `preview/LivePreview.tsx` — assembles local `.html`, `.css`, and `.js` files into a sandboxed iframe `srcdoc` and refreshes when the workspace changes.
 
+Task execution is exposed through `src/lib/agent/workspaceTools.ts` and `agentRunner.ts`. The model bridge advertises four bounded tools — `read_file`, `write_file`, `list_files`, and `execute_command` — and runs at most five tool rounds per request. Completed turns are written to the virtual `.agent_state.json` file in IndexedDB, then the workspace is refreshed so the preview sees changes immediately. The floating action bar on Workspace accepts natural-language tasks and routes them through the active configured provider.
+
 ## Development
 
 ```bash

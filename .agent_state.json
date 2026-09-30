@@ -1,8 +1,8 @@
 {
   "project_name": "mobile-agentic-ide",
   "version": "0.1.0-alpha",
-  "active_agent": "Manus (Execution & Preview Subsystem)",
-  "last_updated": "2026-09-30T23:28:00Z",
+  "active_agent": "Manus (Workspace Agent Tools)",
+  "last_updated": "2026-09-30T23:36:00Z",
   "current_phase": "Phase 1: Project Setup & Architecture Blueprint",
   "completed_tasks": [
     "Read AGENTS.md and the existing .agent_state.json before modifying code",
@@ -21,11 +21,16 @@
     "Extended IndexedDB to persist directories and connected mkdir, recursive rm, and tree listing behavior",
     "Implemented a touch-friendly VirtualTerminal with ls, cat, mkdir, rm, node run, and git status commands",
     "Implemented an isolated LivePreview iframe that assembles local HTML, CSS, and JavaScript with auto-refresh",
-    "Connected Workspace, Terminal, Preview, and Agent Ledger as dedicated mobile tabs"
+    "Connected Workspace, Terminal, Preview, and Agent Ledger as dedicated mobile tabs",
+    "Added model-neutral read_file, write_file, list_files, and execute_command workspace tools",
+    "Extended the Multi-Model Bridge and failover path to advertise and parse provider tool calls",
+    "Added a bounded agentRunner with a five-round tool loop and shared terminal command boundary",
+    "Added a floating natural-language Agent Action Bar that refreshes the workspace and preview after completion",
+    "Recorded completed agent turns in the virtual IndexedDB .agent_state.json ledger"
   ],
-  "current_active_task": "Review the execution and preview subsystem before adding streaming feedback",
+  "current_active_task": "Review the workspace agent tool loop before adding streaming feedback",
   "next_steps": [
-    "Add focused orchestration, terminal, preview, and UI tests",
+    "Add focused orchestration, tool-call, terminal, preview, and UI tests",
     "Move model calls behind a trusted backend before production use of API keys",
     "Add streaming agent feedback in a later task",
     "Add session history persistence and richer code-diff capture"
@@ -33,7 +38,7 @@
   "baseline_notes": {
     "reference_adaptation": "Odysseus workspace and agent concepts are retained as future boundaries, but the client shell is single-surface, touch-first, progressive-disclosure oriented, and intentionally lightweight for mobile PWA use.",
     "storage_notes": "IndexedDB database mobile-agentic-ide, version 2, files and directories stores keyed by normalized relative path. Storage is same-origin and device-local; no backend sync is included.",
-    "agent_notes": "Handover payload format mobile-agentic-ide.handover.v1 is model-neutral and includes agentState, files, diffs, sessionHistory, and system/user messages. Provider keys are kept in a separate device-local IndexedDB vault; this is not hardware-backed encryption.",
+    "agent_notes": "Handover payload format mobile-agentic-ide.handover.v1 is model-neutral and includes agentState, files, diffs, sessionHistory, and system/user messages. Provider keys are kept in a separate device-local IndexedDB vault; this is not hardware-backed encryption. Workspace agent turns expose only four bounded tools and run for at most five tool rounds.",
     "non_goals": [
       "Full application implementation",
       "Model provider or MCP integration",
@@ -42,7 +47,7 @@
       "Streaming agent feedback",
       "Full code editor"
     ],
-    "review_checkpoint": "Task 5 execution terminal, isolated live preview, directory persistence, and mobile tabs complete; stop after validation and commit for review.",
+    "review_checkpoint": "Task 6 workspace tool calls, floating Agent Action Bar, shared terminal execution, automatic refresh, and virtual agent ledger recording complete; stop after validation and commit for review.",
     "validation": {
       "npm_install": "passed",
       "type_check": "passed",
