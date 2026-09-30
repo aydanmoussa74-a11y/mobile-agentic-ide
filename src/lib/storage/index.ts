@@ -1,6 +1,9 @@
 export {
+  createDirectory,
   createFile,
+  deleteDirectory,
   deleteFile,
+  listDirectories,
   listFiles,
   listTree,
   readFile,

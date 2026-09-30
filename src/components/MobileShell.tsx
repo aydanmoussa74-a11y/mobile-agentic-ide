@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-export type AppTab = "workspace" | "handoff";
+export type AppTab = "workspace" | "terminal" | "preview" | "handoff";
 
 interface MobileShellProps extends PropsWithChildren {
   activeTab: AppTab;
@@ -14,7 +14,9 @@ export function MobileShell({ children, activeTab, onNavigate }: MobileShellProp
       <main className="main-surface">{children}</main>
       <nav className="bottom-nav" aria-label="Primary navigation">
         <a className={`nav-item${activeTab === "workspace" ? " nav-item-active" : ""}`} href="#workspace" aria-current={activeTab === "workspace" ? "page" : undefined} onClick={() => onNavigate("workspace")}><span aria-hidden="true">⌘</span><span>Workspace</span></a>
-        <a className={`nav-item${activeTab === "handoff" ? " nav-item-active" : ""}`} href="#handoff" aria-current={activeTab === "handoff" ? "page" : undefined} onClick={() => onNavigate("handoff")}><span aria-hidden="true">↗</span><span>Agent Ledger</span></a>
+        <a className={`nav-item${activeTab === "terminal" ? " nav-item-active" : ""}`} href="#terminal" aria-current={activeTab === "terminal" ? "page" : undefined} onClick={() => onNavigate("terminal")}><span aria-hidden="true">›_</span><span>Terminal</span></a>
+        <a className={`nav-item${activeTab === "preview" ? " nav-item-active" : ""}`} href="#preview" aria-current={activeTab === "preview" ? "page" : undefined} onClick={() => onNavigate("preview")}><span aria-hidden="true">▣</span><span>Preview</span></a>
+        <a className={`nav-item${activeTab === "handoff" ? " nav-item-active" : ""}`} href="#handoff" aria-current={activeTab === "handoff" ? "page" : undefined} onClick={() => onNavigate("handoff")}><span aria-hidden="true">↗</span><span>Ledger</span></a>
       </nav>
     </div>
   );
