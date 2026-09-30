@@ -1,8 +1,8 @@
 {
   "project_name": "mobile-agentic-ide",
   "version": "0.1.0-alpha",
-  "active_agent": "Manus (Local Storage Engine)",
-  "last_updated": "2026-09-30T23:06:00Z",
+  "active_agent": "Manus (Agent Orchestration Engine)",
+  "last_updated": "2026-09-30T23:12:00Z",
   "current_phase": "Phase 1: Project Setup & Architecture Blueprint",
   "completed_tasks": [
     "Read AGENTS.md and the existing .agent_state.json before modifying code",
@@ -13,27 +13,32 @@
     "Added runtime capability and minimal session type boundaries for future handovers",
     "Implemented a typed IndexedDB virtual file system with createFile, readFile, updateFile, deleteFile, and listTree",
     "Connected the local file system to the React workspace with create, select, edit, save, delete, and reload-persistent interactions",
-    "Documented the local persistence slice and its non-goals in README.md"
+    "Documented the local persistence slice and its non-goals in README.md",
+    "Implemented a model-agnostic handoverEngine for agent state, files, diffs, and session history payloads",
+    "Implemented standardized OpenAI-compatible, Anthropic Claude, and Google Gemini fetch adapters",
+    "Implemented automatic provider failover for rate limits, quota exhaustion, and retryable upstream errors",
+    "Added a device-local IndexedDB provider key vault and connected the Agent Ledger UI with active model state and One-Tap Handover"
   ],
-  "current_active_task": "Review the local persistence slice before implementing agent handover orchestration or model providers",
+  "current_active_task": "Review the agent orchestration and handover engine before adding streaming feedback",
   "next_steps": [
-    "Add focused storage and UI tests for the local file system contract",
-    "Define agent handover orchestration boundaries and session transitions",
-    "Add model provider integrations only after the handover state model is approved",
-    "Add streaming agent feedback in a later task"
+    "Add focused orchestration, provider adapter, and UI tests",
+    "Move model calls behind a trusted backend before production use of API keys",
+    "Add streaming agent feedback in a later task",
+    "Add session history persistence and richer code-diff capture"
   ],
   "baseline_notes": {
     "reference_adaptation": "Odysseus workspace and agent concepts are retained as future boundaries, but the client shell is single-surface, touch-first, progressive-disclosure oriented, and intentionally lightweight for mobile PWA use.",
     "storage_notes": "IndexedDB database mobile-agentic-ide, version 1, files object store keyed by normalized relative path. Storage is same-origin and device-local; no backend sync is included.",
+    "agent_notes": "Handover payload format mobile-agentic-ide.handover.v1 is model-neutral and includes agentState, files, diffs, sessionHistory, and system/user messages. Provider keys are kept in a separate device-local IndexedDB vault; this is not hardware-backed encryption.",
     "non_goals": [
       "Full application implementation",
       "Model provider or MCP integration",
       "Authentication or backend services",
       "Production service worker and offline synchronization",
-      "Streaming agent handover engine",
+      "Streaming agent feedback",
       "Full code editor"
     ],
-    "review_checkpoint": "Task 3 local IndexedDB file system engine complete; stop after validation and commit for review.",
+    "review_checkpoint": "Task 4 agent orchestration, provider bridge, failover handler, and Agent Ledger UI complete; stop after validation and commit for review.",
     "validation": {
       "npm_install": "passed",
       "type_check": "passed",
