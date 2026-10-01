@@ -30,6 +30,8 @@ The terminal execution boundary under `src/lib/wasm/` uses a real `WebAssembly.M
 
 The polyglot layer under `src/lib/wasm/polyglotEngine.ts` provides a low-memory JavaScript/Node runtime boundary and an in-memory Python3 subset bridge, both backed by Wasm memory and the IndexedDB VFS. `moduleResolver.ts` resolves relative and local `.js`, `.mjs`, and `.py` modules with an in-memory cache. Agents can use the additional `execute_code` tool for `node` or `python3` source, while the Terminal accepts `node`, `python3`, `-e`, `-c`, and file execution forms. `SandboxBenchmark.tsx` reports live memory allocation, execution latency, VFS throughput, process counts, and isolation violations, plus a repeatable local stress run.
 
+The ecosystem integration boundary under `src/lib/integrations/` contains a browser-local AES-GCM token vault, GitHub REST/GraphQL adapters, and Google Docs/Drive adapters. GitHub can read repository trees, create branches, commit the IndexedDB VFS, and open pull requests. Google can read Docs context and upload a VFS export through Drive multipart upload. Agent tools expose read/status operations directly; external mutations require an explicit `confirm: true` argument and are not executed by this task. Browser storage is still not a hardware-backed secret manager, and OAuth token provisioning remains an explicit user-controlled setup step.
+
 ## Development
 
 ```bash

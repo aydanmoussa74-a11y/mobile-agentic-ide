@@ -1,8 +1,8 @@
 {
   "project_name": "mobile-agentic-ide",
   "version": "0.1.0-alpha",
-  "active_agent": "Manus (Polyglot Wasm Execution Engine)",
-  "last_updated": "2026-10-01T14:50:00Z",
+  "active_agent": "Manus (Ecosystem Integration Engine)",
+  "last_updated": "2026-10-01T15:27:00Z",
   "current_phase": "Phase 1: Project Setup & Architecture Blueprint",
   "completed_tasks": [
     "Read AGENTS.md and the existing .agent_state.json before modifying code",
@@ -42,9 +42,13 @@
     "Implemented polyglotEngine.ts with a Wasm-memory-backed JavaScript runtime boundary and in-memory Python3 subset bridge",
     "Implemented moduleResolver.ts for cached local JavaScript and Python imports from the IndexedDB VFS",
     "Added execute_code agent tooling for node and python3 source execution",
-    "Added a Terminal Sandbox Stress Test panel with live memory, latency, VFS throughput, process, and isolation metrics"
+    "Added a Terminal Sandbox Stress Test panel with live memory, latency, VFS throughput, process, and isolation metrics",
+    "Implemented a browser-local AES-GCM token vault for GitHub and Google OAuth tokens with a persisted non-extractable encryption key",
+    "Implemented GitHub REST and GraphQL adapters for repository tree reads, branch creation, VFS commits, and pull requests",
+    "Implemented Google Docs context reads and Google Drive multipart VFS exports",
+    "Exposed guarded ecosystem tools to agents; external mutations require explicit confirm: true"
   ],
-  "current_active_task": "Review the polyglot Wasm runtimes and sandbox benchmarks before adding streaming feedback",
+  "current_active_task": "Review ecosystem adapters and confirmation boundaries before adding streaming feedback",
   "next_steps": [
     "Add focused orchestration, tool-call, terminal, preview, testing, and UI tests",
     "Move model calls behind a trusted backend before production use of API keys",
@@ -54,7 +58,7 @@
   "baseline_notes": {
     "reference_adaptation": "Odysseus workspace and agent concepts are retained as future boundaries, but the client shell is single-surface, touch-first, progressive-disclosure oriented, and intentionally lightweight for mobile PWA use.",
     "storage_notes": "IndexedDB database mobile-agentic-ide, version 2, files and directories stores keyed by normalized relative path. Storage is same-origin and device-local; no backend sync is included. A portable .agent_state.json ledger is ensured on workspace load.",
-    "agent_notes": "Handover payload format mobile-agentic-ide.handover.v1 is model-neutral and includes agentState, files, diffs, sessionHistory and recent test logs. Provider keys are kept in a separate device-local IndexedDB vault; this is not hardware-backed encryption. Workspace agent turns expose bounded file, command, and execute_code tools and run for at most five tool rounds. execute_command and execute_code use the WebAssembly.Memory-backed WasmContainer, PolyglotEngine, ModuleResolver, and ProcessManager. Verification runs after each tool operation and auto-correction can request at most three additional turns.",
+    "agent_notes": "Handover payload format mobile-agentic-ide.handover.v1 is model-neutral and includes agentState, files, diffs, sessionHistory and recent test logs. Provider keys and GitHub/Google OAuth tokens are kept in separate device-local IndexedDB vaults with local AES-GCM wrapping; this is not hardware-backed encryption. Workspace agent turns expose bounded file, command, code, and ecosystem tools and run for at most five tool rounds. External GitHub branch/commit/PR and Google Drive export mutations require explicit confirm: true. execute_command and execute_code use the WebAssembly.Memory-backed WasmContainer, PolyglotEngine, ModuleResolver, and ProcessManager. Verification runs after each tool operation and auto-correction can request at most three additional turns.",
     "pwa_notes": "src/sw.ts is the service-worker source and public/sw.js is the production static asset. The worker caches the built shell and discovers generated bundle URLs from index.html; IndexedDB remains the offline workspace source of truth.",
     "non_goals": [
       "Full application implementation",
@@ -64,7 +68,7 @@
       "Streaming agent feedback",
       "Full code editor"
     ],
-    "review_checkpoint": "Task 10 polyglot JavaScript/Python Wasm runtime boundary, cached VFS module resolver, agent execute_code tooling, and live sandbox benchmark panel complete; stop after validation and commit for review.",
+    "review_checkpoint": "Task 11 token vault, GitHub REST/GraphQL adapter, Google Docs/Drive adapter, guarded ecosystem agent tools, and confirmation boundaries complete; stop after validation and commit for review.",
     "validation": {
       "npm_install": "passed",
       "type_check": "passed",
