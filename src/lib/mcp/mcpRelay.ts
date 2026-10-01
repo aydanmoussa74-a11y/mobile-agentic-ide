@@ -39,5 +39,5 @@ export class McpRelayClient {
   private emit(): void { const snapshot = this.getSnapshot(); this.listeners.forEach((listener) => listener(snapshot)); }
 }
 
-function readRelayUrl(): string { const configured = import.meta.env.VITE_MCP_RELAY_URL; return (configured || DEFAULT_RELAY_URL).replace(/\/$/, ""); }
+function readRelayUrl(): string { const configured = (import.meta as { env?: { VITE_MCP_RELAY_URL?: string } }).env?.VITE_MCP_RELAY_URL; return (configured || DEFAULT_RELAY_URL).replace(/\/$/, ""); }
 export const mcpRelay = new McpRelayClient();
