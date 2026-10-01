@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { runVirtualCommand as runSharedVirtualCommand } from "./virtualCommands";
-import { createDirectory, deleteDirectory, deleteFile, listDirectories, listFiles, readFile } from "../../lib/storage";
+import { executeCommandStream } from "./virtualCommands";
+import { parseAnsi } from "./ansi";
 import { TestMatrix } from "./TestMatrix";
 import type { TestRunResult } from "../../lib/testing/testRunner";
 
 interface VirtualTerminalProps { onWorkspaceChange: () => Promise<void> | void; testResult: TestRunResult | null; testsRunning: boolean; onRunTests: () => void; }
-interface TerminalLine { kind: "command" | "output" | "error"; text: string; }
+interface TerminalLine { kind: "command" | "output" | "error"; text: string; pid?: number; exitCode?: number; }
 
 export function VirtualTerminal({ onWorkspaceChange, testResult, testsRunning, onRunTests }: VirtualTerminalProps) {
   const [lines, setLines] = useState<TerminalLine[]>([{ kind: "output", text: "Mobile Agentic IDE terminal · type help for commands" }]);
@@ -19,9 +19,10 @@ export function VirtualTerminal({ onWorkspaceChange, testResult, testsRunning, o
     if (!trimmed) return;
     setLines((current) => [...current, { kind: "command", text: `$ ${trimmed}` }]);
     try {
-      const output = await runSharedVirtualCommand(trimmed);
-      if (output) setLines((current) => [...current, { kind: "output", text: output }]);
-      if (/^(mkdir|rm)(\s|$)/.test(trimmed)) await onWorkspaceChange();
+      const result = await executeCommandStream(trimmed, { env: { TERM: "xterm-256color" } });
+      if (result.stdout) setLines((current) => [...current, { kind: "output", text: result.stdout, pid: result.pid, exitCode: result.exitCode }]);
+      if (result.stderr) setLines((current) => [...current, { kind: "error", text: result.stderr, pid: result.pid, exitCode: result.exitCode }]);
+      if (result.processes.some((process) => /^(mkdir|rm|node)/.test(process.command))) await onWorkspaceChange();
     } catch (error: unknown) {
       setLines((current) => [...current, { kind: "error", text: error instanceof Error ? error.message : "Command failed." }]);
     }
@@ -36,14 +37,14 @@ export function VirtualTerminal({ onWorkspaceChange, testResult, testsRunning, o
       <h2 id="terminal-title">Run the workspace.</h2>
       <p className="workspace-intro">Touch-friendly commands operate against the same IndexedDB files used by the editor and preview.</p>
       <div className="terminal-output" role="log" aria-live="polite" onClick={() => inputRef.current?.focus()}>
-        {lines.map((line, index) => <div className={`terminal-line terminal-${line.kind}`} key={`${index}-${line.text}`}>{line.text}</div>)}
+        {lines.map((line, index) => <div className={`terminal-line terminal-${line.kind}`} key={`${index}-${line.text}`}>{line.kind === "command" ? line.text : parseAnsi(line.text).map((segment, segmentIndex) => <span className={segment.className} key={`${segmentIndex}-${segment.text}`}>{segment.text}</span>)}</div>)}
       </div>
       <form className="terminal-form" onSubmit={handleSubmit}>
         <label htmlFor="terminal-command">Command</label>
         <div className="input-row"><span className="terminal-prompt" aria-hidden="true">$</span><input ref={inputRef} id="terminal-command" value={command} onChange={(event) => setCommand(event.target.value)} placeholder="ls" autoComplete="off" autoCapitalize="none" spellCheck={false} /><button className="primary-button" type="submit">Run</button></div>
       </form>
       <TestMatrix result={testResult} running={testsRunning} onRun={onRunTests} />
-      <p className="scope-note">Commands: ls · cat · mkdir · rm · node run · git status</p>
+      <p className="scope-note">Wasm sandbox · pipes · $ENV · ANSI colors · ls · cat · mkdir · rm · node · git</p>
     </section>
   );
 }

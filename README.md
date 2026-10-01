@@ -26,6 +26,8 @@ The in-browser verification boundary under `src/lib/testing/` provides virtual s
 
 The PWA shell uses `src/sw.ts` as the service-worker source and `public/sw.js` as the static production asset. The worker precaches the app shell, manifest, icon, robots file, and discovers the generated Vite bundle URLs from the built HTML. Static same-origin requests are cached for offline reloads, while IndexedDB remains the cloud-free source of truth for workspace state. Workspace also creates/maintains a portable `.agent_state.json` ledger and provides a dependency-free Complete Project ZIP export. One-Tap Handover includes that ledger file, all local files, and the latest Test Matrix logs in the structured payload.
 
+The terminal execution boundary under `src/lib/wasm/` uses a real `WebAssembly.Memory` instance for the sandbox address space and routes POSIX-style `read`, `write`, `stat`, and `readdir` operations to the IndexedDB virtual filesystem. `processManager.ts` owns virtual PIDs, lifecycle state, exit codes, stdin/stdout/stderr buffers, and pipeline stages. Terminal commands now execute through this process layer with `$ENV` expansion, `|` pipelines, and ANSI color parsing. Agent `execute_command` calls use the same Wasm container rather than the former simulated string helper.
+
 ## Development
 
 ```bash

@@ -1,8 +1,8 @@
 {
   "project_name": "mobile-agentic-ide",
   "version": "0.1.0-alpha",
-  "active_agent": "Manus (Offline PWA & Handover Export)",
-  "last_updated": "2026-10-01T00:53:00Z",
+  "active_agent": "Manus (Wasm POSIX Container Engine)",
+  "last_updated": "2026-10-01T01:06:00Z",
   "current_phase": "Phase 1: Project Setup & Architecture Blueprint",
   "completed_tasks": [
     "Read AGENTS.md and the existing .agent_state.json before modifying code",
@@ -34,9 +34,13 @@
     "Implemented a production service worker that caches the app shell, generated Vite bundles, manifest, icon, and static assets for offline reloads",
     "Registered the service worker with active, update-ready, offline, and error status events",
     "Added a dependency-free one-tap Complete Project ZIP export for all IndexedDB files",
-    "Ensured .agent_state.json is maintained in the local workspace and One-Tap Handover includes it plus recent Test Matrix logs"
+    "Ensured .agent_state.json is maintained in the local workspace and One-Tap Handover includes it plus recent Test Matrix logs",
+    "Implemented a WebAssembly.Memory-backed POSIX container layer with read, write, stat, and readdir adapters over IndexedDB",
+    "Implemented virtual process lifecycle management with PIDs, exit codes, stdin, stdout, stderr, and pipeline buffers",
+    "Upgraded Terminal execution to support piped commands, environment expansion, process streams, and ANSI color rendering",
+    "Connected agent execute_command tools directly to the Wasm sandbox process layer"
   ],
-  "current_active_task": "Review offline PWA caching and cloud-free handover export before adding streaming feedback",
+  "current_active_task": "Review the Wasm POSIX container and process streams before adding streaming feedback",
   "next_steps": [
     "Add focused orchestration, tool-call, terminal, preview, testing, and UI tests",
     "Move model calls behind a trusted backend before production use of API keys",
@@ -46,7 +50,7 @@
   "baseline_notes": {
     "reference_adaptation": "Odysseus workspace and agent concepts are retained as future boundaries, but the client shell is single-surface, touch-first, progressive-disclosure oriented, and intentionally lightweight for mobile PWA use.",
     "storage_notes": "IndexedDB database mobile-agentic-ide, version 2, files and directories stores keyed by normalized relative path. Storage is same-origin and device-local; no backend sync is included. A portable .agent_state.json ledger is ensured on workspace load.",
-    "agent_notes": "Handover payload format mobile-agentic-ide.handover.v1 is model-neutral and includes agentState, files, diffs, sessionHistory, and system/user messages. Provider keys are kept in a separate device-local IndexedDB vault; this is not hardware-backed encryption. Workspace agent turns expose only four bounded tools and run for at most five tool rounds. Verification runs after each tool operation and auto-correction can request at most three additional turns.",
+    "agent_notes": "Handover payload format mobile-agentic-ide.handover.v1 is model-neutral and includes agentState, files, diffs, sessionHistory and recent test logs. Provider keys are kept in a separate device-local IndexedDB vault; this is not hardware-backed encryption. Workspace agent turns expose only four bounded tools and run for at most five tool rounds. execute_command uses the WebAssembly.Memory-backed WasmContainer and ProcessManager. Verification runs after each tool operation and auto-correction can request at most three additional turns.",
     "pwa_notes": "src/sw.ts is the service-worker source and public/sw.js is the production static asset. The worker caches the built shell and discovers generated bundle URLs from index.html; IndexedDB remains the offline workspace source of truth.",
     "non_goals": [
       "Full application implementation",
@@ -56,7 +60,7 @@
       "Streaming agent feedback",
       "Full code editor"
     ],
-    "review_checkpoint": "Task 8 production service worker, offline app-shell caching, Complete Project ZIP export, portable agent-state ledger, and test-log-complete handover complete; stop after validation and commit for review.",
+    "review_checkpoint": "Task 9 WebAssembly.Memory-backed POSIX container, IndexedDB syscall routing, virtual process streams, pipe/env/ANSI terminal execution, and agent sandbox integration complete; stop after validation and commit for review.",
     "validation": {
       "npm_install": "passed",
       "type_check": "passed",
