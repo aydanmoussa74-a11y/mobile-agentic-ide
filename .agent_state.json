@@ -1,8 +1,8 @@
 {
   "project_name": "mobile-agentic-ide",
   "version": "0.1.0-alpha",
-  "active_agent": "Manus (Virtual Git and Time-Travel Engine)",
-  "last_updated": "2026-10-01T16:35:00Z",
+  "active_agent": "Manus (Background Process Scheduler and Log Vault)",
+  "last_updated": "2026-10-01T16:50:00Z",
   "current_phase": "Phase 1: Project Setup & Architecture Blueprint",
   "completed_tasks": [
     "Read AGENTS.md and the existing .agent_state.json before modifying code",
@@ -67,9 +67,13 @@
     "Implemented IndexedDB-backed VFS checkpoints with automatic pre-agent-operation snapshots and one-tap rollback",
     "Implemented lightweight persistent main and experimental virtual branches",
     "Exposed vfs_checkpoint, vfs_rollback, vfs_diff, vfs_switch_branch, and vfs_list_branches through workspace and MCP tool schemas",
-    "Completed browser smoke verification of VFS diffs, rollback restoration, branch metadata, and MCP VFS tool exposure"
+    "Completed browser smoke verification of VFS diffs, rollback restoration, branch metadata, and MCP VFS tool exposure",
+    "Implemented a bounded non-blocking processScheduler with queued, running, completed, failed, cancelled states and kill signals",
+    "Implemented IndexedDB logStorage for process records and structured tool, status, stdout, stderr, and error logs",
+    "Exposed process_schedule, process_status, process_logs, and process_kill through workspace tools and registry-driven MCP schemas",
+    "Completed browser smoke verification of scheduling, completion logs, cancellation, MCP process tools, and post-refresh log persistence"
   ],
-  "current_active_task": "Virtual Git and time-travel engine verified; deploy relay-worker/ separately before enabling live public relay use",
+  "current_active_task": "Background scheduler and log vault verified; deploy relay-worker/ separately before enabling live public relay use",
   "next_steps": [
     "Add focused orchestration, tool-call, terminal, preview, testing, and UI tests",
     "Move model calls behind a trusted backend before production use of API keys",
@@ -90,7 +94,7 @@
       "Streaming agent feedback",
       "Full code editor"
     ],
-    "review_checkpoint": "Task 15 unified diffs, automatic agent-operation checkpoints, rollback, main/experimental branches, workspace tool exposure, and browser smoke verification complete; live relay remains deployment-gated.",
+    "review_checkpoint": "Task 16 scheduler queue, cancellation, persistent process/log vault, workspace/MCP tools, and post-refresh browser smoke verification complete; live relay remains deployment-gated.",
     "validation": {
       "npm_install": "passed",
       "type_check": "passed",
@@ -99,7 +103,9 @@
       "generated_artifacts_excluded": true,
       "browser_smoke": "passed",
       "live_public_relay": "not run; relay-worker source is not deployed",
-      "vfs_time_travel_smoke": "passed"
+      "vfs_time_travel_smoke": "passed",
+      "process_scheduler_smoke": "passed",
+      "process_log_reload_smoke": "passed"
     }
   }
 }

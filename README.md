@@ -40,6 +40,8 @@ Task 13 adds `src/lib/mcp/mcpRelay.ts` as an explicit opt-in WebSocket client. I
 
 Task 15 adds the in-memory-style virtual Git layer under `src/lib/vfs/`. `diffEngine.ts` calculates unified line and file-set diffs, `vfsHistory.ts` persists up to 50 branch-scoped snapshots and restores complete files/directories, and `vfsBranching.ts` maintains lightweight `main` and `experimental` branch heads in IndexedDB with the active branch in local storage. Agent `read_file`, `write_file`, and `execute_command` operations checkpoint automatically before execution. `vfs_checkpoint`, `vfs_rollback`, `vfs_diff`, `vfs_switch_branch`, and `vfs_list_branches` are exposed through the same workspace registry and therefore through MCP schemas.
 
+Task 16 adds `src/lib/agent/processScheduler.ts` and `logStorage.ts`. The scheduler queues non-blocking Wasm commands with bounded concurrency, persists queued/running/completed/failed/cancelled process records, supports `kill_process` cancellation signals, and marks interrupted work after a browser refresh. Structured tool, status, stdout, stderr, and error entries are retained in a separate device-local IndexedDB database. `process_schedule`, `process_status`, `process_logs`, and `process_kill` are exposed through the workspace registry and automatically appear in MCP tool schemas.
+
 ## Development
 
 ```bash

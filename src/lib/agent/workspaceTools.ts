@@ -3,6 +3,7 @@ import { polyglotEngine, wasmContainer } from "../wasm";
 import { githubAdapter, googleAdapter, invokeIntegration, listIntegrations, tokenVault } from "../integrations";
 import { runVirtualTests } from "../testing";
 import { vfsHistory, switchBranch, type VfsBranchName } from "../vfs";
+import { processScheduler } from "./processScheduler";
 import type { ToolCall, ToolDefinition } from "./types";
 
 const confirmation = { type: "boolean", description: "Must be true to authorize an external mutation." };
@@ -18,6 +19,10 @@ export const workspaceTools: ToolDefinition[] = [
   { name: "vfs_diff", description: "Calculate unified line-by-line diffs between a checkpoint and the current workspace.", parameters: { type: "object", properties: { snapshotId: { type: "string" } } } },
   { name: "vfs_switch_branch", description: "Switch the active lightweight virtual branch between main and experimental.", parameters: { type: "object", properties: { branch: { type: "string", enum: ["main", "experimental"] } }, required: ["branch"] } },
   { name: "vfs_list_branches", description: "List virtual branches, their checkpoint heads, and the active branch.", parameters: { type: "object", properties: {} } },
+  { name: "process_schedule", description: "Queue a non-blocking command in the persistent local process scheduler.", parameters: { type: "object", properties: { command: { type: "string" }, env: { type: "object", additionalProperties: { type: "string" } } }, required: ["command"] } },
+  { name: "process_status", description: "Read one scheduled process or the recent process queue, including queued, running, completed, failed, and cancelled states.", parameters: { type: "object", properties: { processId: { type: "string" } } } },
+  { name: "process_logs", description: "Read persisted stdout, stderr, status, error, and tool execution logs for a scheduled process.", parameters: { type: "object", properties: { processId: { type: "string" } } } },
+  { name: "process_kill", description: "Cancel a queued or running scheduled process using its process ID.", parameters: { type: "object", properties: { processId: { type: "string" } }, required: ["processId"] } },
   { name: "integration_status", description: "Check whether GitHub or Google OAuth tokens are configured locally without exposing token values.", parameters: { type: "object", properties: {} } },
   { name: "github_clone", description: "Read a GitHub repository tree into a structured result for the local workspace.", parameters: { type: "object", properties: { owner: { type: "string" }, repo: { type: "string" }, branch: { type: "string" } }, required: ["owner", "repo"] } },
   { name: "github_create_branch", description: "Create a GitHub branch. Requires explicit confirmation.", parameters: { type: "object", properties: { owner: { type: "string" }, repo: { type: "string" }, branch: { type: "string" }, fromBranch: { type: "string" }, confirm: confirmation }, required: ["owner", "repo", "branch", "confirm"] } },
@@ -45,6 +50,10 @@ export async function executeWorkspaceTool(call: ToolCall): Promise<string> {
   if (call.name === "vfs_diff") return JSON.stringify(await vfsHistory.diffAgainst(optionalString(call, "snapshotId")));
   if (call.name === "vfs_switch_branch") { const branch = call.arguments.branch === "experimental" ? "experimental" : call.arguments.branch === "main" ? "main" : null; if (!branch) throw new Error("vfs_switch_branch requires branch=main|experimental"); return JSON.stringify(await switchBranch(branch)); }
   if (call.name === "vfs_list_branches") return JSON.stringify(await vfsHistory.branches());
+  if (call.name === "process_schedule") { const command = stringArg(call, "command"); return JSON.stringify(await processScheduler.schedule(command, readEnvironment(call.arguments.env))); }
+  if (call.name === "process_status") return JSON.stringify(await processScheduler.status(optionalString(call, "processId")));
+  if (call.name === "process_logs") return JSON.stringify(await processScheduler.logs(optionalString(call, "processId")));
+  if (call.name === "process_kill") return JSON.stringify(await processScheduler.kill(stringArg(call, "processId")));
   if (call.name === "integration_status") return JSON.stringify({ providers: listIntegrations(), configured: { github: await tokenVault.has("github"), google: await tokenVault.has("google") } });
   if (call.name === "github_clone") return JSON.stringify(await githubAdapter.cloneRepository(stringArg(call, "owner"), stringArg(call, "repo"), optionalString(call, "branch") ?? "main"));
   if (call.name === "github_create_branch") { requireConfirmation(call); await githubAdapter.createBranch(stringArg(call, "owner"), stringArg(call, "repo"), stringArg(call, "branch"), optionalString(call, "fromBranch") ?? "main"); return `created GitHub branch ${call.arguments.branch}`; }

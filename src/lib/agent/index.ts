@@ -4,4 +4,7 @@ export { callWithFailover, isFailoverError } from "./failoverHandler";
 export { runAgentTurn } from "./agentRunner";
 export { deleteProviderKey, readProviderKey, saveProviderKey } from "./providerVault";
 export { executeWorkspaceTool, workspaceTools } from "./workspaceTools";
+export { processScheduler, ProcessScheduler } from "./processScheduler";
+export { logStorage, LogStorage } from "./logStorage";
+export type { ExecutionLog, ExecutionLogKind, ProcessStatus, StoredProcess } from "./logStorage";
 export type * from "./types";
