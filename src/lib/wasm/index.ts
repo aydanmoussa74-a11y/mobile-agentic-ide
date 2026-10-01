@@ -6,3 +6,5 @@ export type { PosixStat, WasmCommandOptions, WasmMetrics } from "./wasmContainer
 export type { PolyglotLanguage, PolyglotOptions, PolyglotResult } from "./polyglotEngine";
 export type { ResolvedModule } from "./moduleResolver";
 export type { ProcessMetrics, ProcessResult, ProcessSpec, StreamBuffer, VirtualProcess } from "./processManager";
+export { memoryBytes, guardSnapshot, withMemoryGuard, MemoryGuardError, memoryGuardDefaults } from "./memoryGuard";
+export type { MemoryGuardOptions, MemoryGuardSnapshot } from "./memoryGuard";

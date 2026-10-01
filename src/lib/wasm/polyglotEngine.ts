@@ -1,9 +1,10 @@
 import { readFile } from "../storage";
 import { moduleResolver } from "./moduleResolver";
+import { withMemoryGuard } from "./memoryGuard";
 
 export type PolyglotLanguage = "python3" | "python" | "node" | "javascript";
 export interface PolyglotResult { language: PolyglotLanguage; stdout: string; stderr: string; exitCode: number; durationMs: number; modules: string[]; }
-export interface PolyglotOptions { filename?: string; env?: Record<string, string>; signal?: AbortSignal; }
+export interface PolyglotOptions { filename?: string; env?: Record<string, string>; signal?: AbortSignal; timeoutMs?: number; maxMemoryBytes?: number; }
 
 export class PolyglotEngine {
   readonly memory = new WebAssembly.Memory({ initial: 1, maximum: 8 });
@@ -15,6 +16,10 @@ export class PolyglotEngine {
   }
 
   async run(language: PolyglotLanguage, source: string, options: PolyglotOptions = {}): Promise<PolyglotResult> {
+    return withMemoryGuard(() => this.runUnchecked(language, source, options), [this.memory], { ...options, label: options.filename ? `Polyglot ${options.filename}` : `Polyglot ${language}` }).catch((error: unknown) => ({ language, stdout: "", stderr: error instanceof Error ? error.message : "runtime guard failure", exitCode: error instanceof Error && "code" in error && error.code === "ABORTED" ? 130 : 1, durationMs: 0, modules: [] }));
+  }
+
+  private async runUnchecked(language: PolyglotLanguage, source: string, options: PolyglotOptions = {}): Promise<PolyglotResult> {
     const started = performance.now();
     const normalized = language === "python" ? "python3" : language === "javascript" ? "node" : language;
     const bytes = new TextEncoder().encode(source);

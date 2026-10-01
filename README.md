@@ -42,6 +42,8 @@ Task 15 adds the in-memory-style virtual Git layer under `src/lib/vfs/`. `diffEn
 
 Task 16 adds `src/lib/agent/processScheduler.ts` and `logStorage.ts`. The scheduler queues non-blocking Wasm commands with bounded concurrency, persists queued/running/completed/failed/cancelled process records, supports `kill_process` cancellation signals, and marks interrupted work after a browser refresh. Structured tool, status, stdout, stderr, and error entries are retained in a separate device-local IndexedDB database. `process_schedule`, `process_status`, `process_logs`, and `process_kill` are exposed through the workspace registry and automatically appear in MCP tool schemas.
 
+Task 18 adds production hardening under `src/lib/vfs/storageManager.ts`, `src/lib/wasm/memoryGuard.ts`, and `src/lib/system/healthCheck.ts`. Browser quota estimates are collected when supported; VFS snapshots and execution logs receive LRU pruning; POSIX and polyglot execution are bounded by timeout, abort, and memory guards; the MCP relay reconnects with capped exponential backoff and a 15-second heartbeat; and `system_health` reports secret-free storage, Wasm, process, vault, and MCP diagnostics.
+
 ## Development
 
 ```bash

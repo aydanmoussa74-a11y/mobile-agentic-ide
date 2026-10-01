@@ -50,3 +50,9 @@ Provider credentials and ecosystem tokens use device-local AES-GCM wrapping with
 ## Performance and Reliability
 
 Prefer lazy work, bounded queues, small payloads, and one IndexedDB transaction per operation. Avoid desktop multi-pane assumptions. Keep long work asynchronous, expose status, persist logs, honor cancellation, and recover interrupted processes after browser refresh. Validate every change with type-checking, production build, and focused runtime smoke tests.
+
+## Production Hardening
+
+`src/lib/vfs/storageManager.ts` reads `navigator.storage.estimate()` when available and prunes VFS history to 50 snapshots per branch plus the oldest execution logs beyond 100 records. VFS checkpoints already invoke branch pruning; log writes invoke asynchronous LRU cleanup. `src/lib/wasm/memoryGuard.ts` bounds POSIX and polyglot executions with a default 10-second timeout and 16 MiB combined Wasm-memory limit, while preserving abort signals and returning guarded failures instead of destabilizing the tab.
+
+The MCP relay reconnects with exponential delays of 1, 2, 4 seconds up to 30 seconds and sends a heartbeat every 15 seconds while live. `src/lib/system/healthCheck.ts` provides a secret-free snapshot of quota metrics, Wasm memory and process metrics, scheduler counts, provider vault presence, and MCP server/relay status through `system_health`.

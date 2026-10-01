@@ -1,8 +1,8 @@
 {
   "project_name": "mobile-agentic-ide",
   "version": "0.1.0-alpha",
-  "active_agent": "Manus (Native Child-Agent Tasks and Repository Documentation)",
-  "last_updated": "2026-10-01T17:00:00Z",
+  "active_agent": "Manus (Production Hardening and System Resilience)",
+  "last_updated": "2026-10-01T17:30:00Z",
   "current_phase": "Phase 1: Project Setup & Architecture Blueprint",
   "completed_tasks": [
     "Read AGENTS.md and the existing .agent_state.json before modifying code",
@@ -75,9 +75,14 @@
     "Implemented native spawn_sub_agent scheduling with bounded prompt, system instruction, and allowed-tool metadata",
     "Added model-neutral child-task dispatch envelopes and child-task lifecycle logging through processScheduler",
     "Added root AGENTS.md, ENGINEERING.md, CONTRIBUTION.md, DOCS.md, and CHANGELOG.md documentation",
-    "Completed browser smoke verification of child-task metadata, asynchronous completion, envelope logs, and MCP spawn_sub_agent exposure"
+    "Completed browser smoke verification of child-task metadata, asynchronous completion, envelope logs, and MCP spawn_sub_agent exposure",
+    "Implemented storageManager quota estimation and automatic LRU pruning for VFS snapshots and execution logs",
+    "Implemented memoryGuard timeout, abort, and memory-bound protections for POSIX and polyglot execution",
+    "Added MCP relay exponential reconnect backoff capped at 30 seconds and a 15-second heartbeat loop",
+    "Added secret-free system_health diagnostics for storage, Wasm, processes, vault state, and MCP status",
+    "Exposed system_health through workspace tools and registry-driven MCP schemas"
   ],
-  "current_active_task": "Native child-task scheduling and repository documentation verified; deploy relay-worker/ separately before enabling live public relay use",
+  "current_active_task": "Production hardening and system resilience verified; deploy relay-worker/ separately before enabling live public relay use",
   "next_steps": [
     "Add focused orchestration, tool-call, terminal, preview, testing, and UI tests",
     "Move model calls behind a trusted backend before production use of API keys",
@@ -98,7 +103,7 @@
       "Streaming agent feedback",
       "Full code editor"
     ],
-    "review_checkpoint": "Task 17 bounded spawn_sub_agent scheduling, repository documentation, workspace/MCP exposure, and browser smoke verification complete; live relay remains deployment-gated.",
+    "review_checkpoint": "Task 18 quota pruning, execution guards, relay resilience, system_health diagnostics, documentation, and smoke verification complete; live relay remains deployment-gated.",
     "validation": {
       "npm_install": "passed",
       "type_check": "passed",
@@ -110,7 +115,10 @@
       "vfs_time_travel_smoke": "passed",
       "process_scheduler_smoke": "passed",
       "process_log_reload_smoke": "passed",
-      "spawn_sub_agent_smoke": "passed"
+      "spawn_sub_agent_smoke": "passed",
+      "system_health_smoke": "passed",
+      "memory_guard_smoke": "passed",
+      "relay_resilience_smoke": "passed (backoff/heartbeat implementation inspected; live public relay remains deployment-gated)"
     }
   }
 }

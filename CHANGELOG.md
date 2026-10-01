@@ -2,6 +2,10 @@
 
 All entries describe modular milestones in the mobile-agentic-ide project. Dates reflect the project handover sequence.
 
+## Task 18 — Production Hardening and System Resilience
+
+Added browser quota estimation and automatic LRU pruning for VFS snapshots and execution logs. Added Wasm/polyglot timeout, abort, and memory guards. Added MCP relay exponential reconnect backoff capped at 30 seconds plus 15-second heartbeats. Added secret-free `system_health` diagnostics for storage, Wasm, processes, provider vault state, and MCP tunnel status.
+
 ## Task 17 — Repository Documentation and Native Child Tasks
 
 - Added `spawn_sub_agent` to the workspace and registry-driven MCP tool surface.

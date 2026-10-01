@@ -36,6 +36,7 @@ Snapshots are local and branch-scoped. The history layer keeps up to 50 snapshot
 | `process_logs` | optional `processId` | Read persisted tool, status, stdout, stderr, and error logs. |
 | `process_kill` | `processId` | Cancel a queued or running process. |
 | `spawn_sub_agent` | `prompt`, optional `systemInstructions`, optional `allowedTools[]` | Queue a bounded model-neutral child-task envelope and return its process ID. |
+| `system_health` | — | Collect secret-free storage, Wasm, process, vault, and MCP health metrics. |
 
 Child tasks are asynchronous scheduler records with explicit prompt, system instruction, and tool bounds. The current client produces a `mobile-agentic-ide.child-task.v1` dispatch envelope; a trusted provider runner may consume that envelope later. Use `process_status` and `process_logs` to track it. The scheduler limits allowed tool names to 24 entries.
 
@@ -67,6 +68,7 @@ Child tasks are asynchronous scheduler records with explicit prompt, system inst
 - `diffFiles(before, after)` compares file arrays.
 - `vfsHistory.checkpoint(label)`, `.listSnapshots()`, `.rollback(snapshotId)`, `.diffAgainst(snapshotId)`, and `.branches()` manage local history.
 - `switchBranch("main" | "experimental")` changes the active branch.
+- `storageManager.estimate()` reads browser quota metrics when supported; `.prune()` removes snapshots beyond 50 per branch and logs beyond 100; `.maintain()` runs the same cleanup and returns metrics.
 
 ### `src/lib/agent`
 
@@ -74,6 +76,7 @@ Child tasks are asynchronous scheduler records with explicit prompt, system inst
 - `processScheduler.scheduleSubAgent(spec)` queues a bounded child envelope.
 - `processScheduler.status(id?)`, `.logs(id?)`, and `.kill(id)` inspect or cancel work.
 - `logStorage.saveProcess`, `.getProcess`, `.listProcesses`, `.appendLog`, `.listLogs`, and `.clearProcess` persist runtime records.
+- `logStorage.prune(100)` removes oldest execution records; log writes trigger this cleanup asynchronously.
 
 ### `src/lib/mcp`
 
@@ -81,6 +84,11 @@ Child tasks are asynchronous scheduler records with explicit prompt, system inst
 - `toMcpTool` and `toMcpTools` convert typed workspace definitions into MCP input schemas.
 - `mcpTransport.ts` provides browser HTTP/SSE handling.
 - `mcpRelay.ts` provides opt-in WebSocket relay mode; `relay-worker/` contains the Cloudflare Worker source.
+- Relay reconnection uses 1/2/4-second exponential backoff capped at 30 seconds and a 15-second heartbeat.
+
+### `src/lib/wasm`
+
+`withMemoryGuard()` enforces execution timeouts, abort signals, and Wasm-memory limits. POSIX commands and direct polyglot runs use a default 10,000ms timeout and 16 MiB combined memory limit; callers may pass narrower `timeoutMs` and `maxMemoryBytes` options.
 
 ### `src/lib/integrations`
 

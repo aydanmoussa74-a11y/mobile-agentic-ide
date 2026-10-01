@@ -4,6 +4,7 @@ import { githubAdapter, googleAdapter, invokeIntegration, listIntegrations, toke
 import { runVirtualTests } from "../testing";
 import { vfsHistory, switchBranch, type VfsBranchName } from "../vfs";
 import { processScheduler } from "./processScheduler";
+import { collectSystemHealth } from "../system";
 import type { ToolCall, ToolDefinition } from "./types";
 
 const confirmation = { type: "boolean", description: "Must be true to authorize an external mutation." };
@@ -24,6 +25,7 @@ export const workspaceTools: ToolDefinition[] = [
   { name: "process_logs", description: "Read persisted stdout, stderr, status, error, and tool execution logs for a scheduled process.", parameters: { type: "object", properties: { processId: { type: "string" } } } },
   { name: "process_kill", description: "Cancel a queued or running scheduled process using its process ID.", parameters: { type: "object", properties: { processId: { type: "string" } }, required: ["processId"] } },
   { name: "spawn_sub_agent", description: "Queue a bounded child-agent task asynchronously with its own prompt, system instructions, and allowed tool names. Returns a process ID for status and logs.", parameters: { type: "object", properties: { prompt: { type: "string" }, systemInstructions: { type: "string" }, allowedTools: { type: "array", items: { type: "string" }, maxItems: 24 } }, required: ["prompt"] } },
+  { name: "system_health", description: "Collect storage quota, Wasm memory, process, provider vault, and MCP relay/server health diagnostics without exposing secrets.", parameters: { type: "object", properties: {} } },
   { name: "integration_status", description: "Check whether GitHub or Google OAuth tokens are configured locally without exposing token values.", parameters: { type: "object", properties: {} } },
   { name: "github_clone", description: "Read a GitHub repository tree into a structured result for the local workspace.", parameters: { type: "object", properties: { owner: { type: "string" }, repo: { type: "string" }, branch: { type: "string" } }, required: ["owner", "repo"] } },
   { name: "github_create_branch", description: "Create a GitHub branch. Requires explicit confirmation.", parameters: { type: "object", properties: { owner: { type: "string" }, repo: { type: "string" }, branch: { type: "string" }, fromBranch: { type: "string" }, confirm: confirmation }, required: ["owner", "repo", "branch", "confirm"] } },
@@ -56,6 +58,7 @@ export async function executeWorkspaceTool(call: ToolCall): Promise<string> {
   if (call.name === "process_logs") return JSON.stringify(await processScheduler.logs(optionalString(call, "processId")));
   if (call.name === "process_kill") return JSON.stringify(await processScheduler.kill(stringArg(call, "processId")));
   if (call.name === "spawn_sub_agent") { const allowedTools = Array.isArray(call.arguments.allowedTools) ? call.arguments.allowedTools.filter((tool): tool is string => typeof tool === "string") : undefined; return JSON.stringify(await processScheduler.scheduleSubAgent({ prompt: stringArg(call, "prompt"), systemInstructions: optionalString(call, "systemInstructions"), allowedTools })); }
+  if (call.name === "system_health") return JSON.stringify(await collectSystemHealth());
   if (call.name === "integration_status") return JSON.stringify({ providers: listIntegrations(), configured: { github: await tokenVault.has("github"), google: await tokenVault.has("google") } });
   if (call.name === "github_clone") return JSON.stringify(await githubAdapter.cloneRepository(stringArg(call, "owner"), stringArg(call, "repo"), optionalString(call, "branch") ?? "main"));
   if (call.name === "github_create_branch") { requireConfirmation(call); await githubAdapter.createBranch(stringArg(call, "owner"), stringArg(call, "repo"), stringArg(call, "branch"), optionalString(call, "fromBranch") ?? "main"); return `created GitHub branch ${call.arguments.branch}`; }
