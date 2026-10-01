@@ -1,6 +1,6 @@
 import { createFile, listDirectories, listFiles, readFile, updateFile } from "../storage";
 import { polyglotEngine, wasmContainer } from "../wasm";
-import { githubAdapter, googleAdapter, tokenVault } from "../integrations";
+import { githubAdapter, googleAdapter, invokeIntegration, listIntegrations, tokenVault } from "../integrations";
 import type { ToolCall, ToolDefinition } from "./types";
 
 const confirmation = { type: "boolean", description: "Must be true to authorize an external mutation." };
@@ -16,7 +16,11 @@ export const workspaceTools: ToolDefinition[] = [
   { name: "github_commit_vfs", description: "Commit all IndexedDB VFS files to a GitHub branch. Requires explicit confirmation.", parameters: { type: "object", properties: { owner: { type: "string" }, repo: { type: "string" }, branch: { type: "string" }, message: { type: "string" }, confirm: confirmation }, required: ["owner", "repo", "branch", "message", "confirm"] } },
   { name: "github_open_pr", description: "Open a GitHub pull request. Requires explicit confirmation.", parameters: { type: "object", properties: { owner: { type: "string" }, repo: { type: "string" }, head: { type: "string" }, base: { type: "string" }, title: { type: "string" }, body: { type: "string" }, confirm: confirmation }, required: ["owner", "repo", "head", "base", "title", "confirm"] } },
   { name: "google_read_doc", description: "Read text context from a Google Doc using the local Google OAuth token.", parameters: { type: "object", properties: { documentId: { type: "string" } }, required: ["documentId"] } },
+  { name: "google_write_doc", description: "Replace the text of a Google Doc. Requires explicit confirmation.", parameters: { type: "object", properties: { documentId: { type: "string" }, text: { type: "string" }, confirm: confirmation }, required: ["documentId", "text", "confirm"] } },
   { name: "google_export_vfs", description: "Export the current IndexedDB VFS manifest to Google Drive. Requires explicit confirmation.", parameters: { type: "object", properties: { name: { type: "string" }, confirm: confirmation }, required: ["name", "confirm"] } },
+  { name: "github_list_issues", description: "List GitHub issues through the registered GitHub provider.", parameters: { type: "object", properties: { owner: { type: "string" }, repo: { type: "string" }, state: { type: "string" } }, required: ["owner", "repo"] } },
+  { name: "github_create_issue", description: "Create a GitHub issue. Requires explicit confirmation.", parameters: { type: "object", properties: { owner: { type: "string" }, repo: { type: "string" }, title: { type: "string" }, body: { type: "string" }, confirm: confirmation }, required: ["owner", "repo", "title", "confirm"] } },
+  { name: "integration_request", description: "Call any registered provider operation, including future MCP-backed providers. Requires explicit confirmation.", parameters: { type: "object", properties: { providerId: { type: "string" }, operation: { type: "string" }, input: { type: "object" }, confirm: confirmation }, required: ["providerId", "operation", "input", "confirm"] } },
 ];
 
 export async function executeWorkspaceTool(call: ToolCall): Promise<string> {
@@ -26,13 +30,17 @@ export async function executeWorkspaceTool(call: ToolCall): Promise<string> {
   if (call.name === "list_files") { const [files, directories] = await Promise.all([listFiles(), listDirectories()]); return JSON.stringify({ files: files.map((file) => file.path), directories }); }
   if (call.name === "execute_command") { if (typeof call.arguments.command !== "string") throw new Error("execute_command requires a command string"); const result = await wasmContainer.execute(call.arguments.command, { env: readEnvironment(call.arguments.env) }); if (result.exitCode !== 0) throw new Error(result.stderr || `Command exited with code ${result.exitCode}`); return result.stdout; }
   if (call.name === "execute_code") { const language = call.arguments.language === "python3" ? "python3" : call.arguments.language === "node" ? "node" : null; if (!language || typeof call.arguments.code !== "string") throw new Error("execute_code requires language=node|python3 and code"); const result = await polyglotEngine.run(language, call.arguments.code, { filename: typeof call.arguments.filename === "string" ? call.arguments.filename : language === "node" ? "index.js" : "main.py" }); if (result.exitCode !== 0) throw new Error(result.stderr || `Code exited with code ${result.exitCode}`); return result.stdout; }
-  if (call.name === "integration_status") return JSON.stringify({ github: await tokenVault.has("github"), google: await tokenVault.has("google") });
+  if (call.name === "integration_status") return JSON.stringify({ providers: listIntegrations(), configured: { github: await tokenVault.has("github"), google: await tokenVault.has("google") } });
   if (call.name === "github_clone") return JSON.stringify(await githubAdapter.cloneRepository(stringArg(call, "owner"), stringArg(call, "repo"), optionalString(call, "branch") ?? "main"));
   if (call.name === "github_create_branch") { requireConfirmation(call); await githubAdapter.createBranch(stringArg(call, "owner"), stringArg(call, "repo"), stringArg(call, "branch"), optionalString(call, "fromBranch") ?? "main"); return `created GitHub branch ${call.arguments.branch}`; }
   if (call.name === "github_commit_vfs") { requireConfirmation(call); return JSON.stringify(await githubAdapter.commitVfs(stringArg(call, "owner"), stringArg(call, "repo"), stringArg(call, "branch"), stringArg(call, "message"))); }
   if (call.name === "github_open_pr") { requireConfirmation(call); return JSON.stringify(await githubAdapter.openPullRequest(stringArg(call, "owner"), stringArg(call, "repo"), stringArg(call, "head"), stringArg(call, "base"), stringArg(call, "title"), optionalString(call, "body") ?? "")); }
   if (call.name === "google_read_doc") return JSON.stringify(await googleAdapter.readDocument(stringArg(call, "documentId")));
+  if (call.name === "google_write_doc") { requireConfirmation(call); return JSON.stringify(await googleAdapter.writeDocument(stringArg(call, "documentId"), stringArg(call, "text"))); }
   if (call.name === "google_export_vfs") { requireConfirmation(call); return JSON.stringify(await googleAdapter.exportVfsToDrive(stringArg(call, "name"))); }
+  if (call.name === "github_list_issues") return JSON.stringify(await invokeIntegration("github", "listIssues", { owner: stringArg(call, "owner"), repo: stringArg(call, "repo"), state: optionalString(call, "state") ?? "open" }));
+  if (call.name === "github_create_issue") { requireConfirmation(call); return JSON.stringify(await invokeIntegration("github", "createIssue", { owner: stringArg(call, "owner"), repo: stringArg(call, "repo"), title: stringArg(call, "title"), body: optionalString(call, "body") ?? "" })); }
+  if (call.name === "integration_request") { if (call.arguments.confirm === true) return JSON.stringify(await invokeIntegration(stringArg(call, "providerId"), stringArg(call, "operation"), (call.arguments.input ?? {}) as Record<string, unknown>)); throw new Error("integration_request requires confirm: true because provider operations may be external."); }
   throw new Error(`Unsupported workspace tool: ${call.name}`);
 }
 

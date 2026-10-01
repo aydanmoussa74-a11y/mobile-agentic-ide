@@ -32,6 +32,8 @@ The polyglot layer under `src/lib/wasm/polyglotEngine.ts` provides a low-memory 
 
 The ecosystem integration boundary under `src/lib/integrations/` contains a browser-local AES-GCM token vault, GitHub REST/GraphQL adapters, and Google Docs/Drive adapters. GitHub can read repository trees, create branches, commit the IndexedDB VFS, and open pull requests. Google can read Docs context and upload a VFS export through Drive multipart upload. Agent tools expose read/status operations directly; external mutations require an explicit `confirm: true` argument and are not executed by this task. Browser storage is still not a hardware-backed secret manager, and OAuth token provisioning remains an explicit user-controlled setup step.
 
+`registry.ts` provides dynamic provider registration for GitHub, GitLab, Google Workspace, Notion, Linear, Slack, Supabase, Vercel, or future MCP-backed services without changing the agent loop. `genericHttpAdapter.ts` supports provider-scoped REST calls and webhooks. The baseline registry registers GitHub, Google Workspace, and Generic HTTP; additional providers can register an id, capabilities, and an `invoke` implementation at runtime. The token vault supports arbitrary provider IDs and named credentials such as `accessToken` or `apiKey`.
+
 ## Development
 
 ```bash

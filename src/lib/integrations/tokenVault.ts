@@ -1,6 +1,6 @@
-export type IntegrationId = "github" | "google";
+export type IntegrationId = string;
 
-interface VaultRecord { id: IntegrationId; iv: number[]; ciphertext: number[]; updatedAt: number; }
+interface VaultRecord { id: string; providerId: string; key: string; iv: number[]; ciphertext: number[]; updatedAt: number; }
 
 const DATABASE = "mobile-agentic-ide-integrations";
 const VERSION = 1;
@@ -12,22 +12,22 @@ const decoder = new TextDecoder();
 export class TokenVault {
   private keyPromise?: Promise<CryptoKey>;
 
-  async save(id: IntegrationId, token: string): Promise<void> {
+  async save(id: IntegrationId, token: string, credentialKey = "accessToken"): Promise<void> {
     if (!token.trim()) throw new Error("Token cannot be empty.");
-    const key = await this.key();
+    const cryptoKey = await this.key();
     const iv = crypto.getRandomValues(new Uint8Array(12));
-    const ciphertext = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, encoder.encode(token.trim())));
-    await this.put({ id, iv: [...iv], ciphertext: [...ciphertext], updatedAt: Date.now() });
+    const ciphertext = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, cryptoKey, encoder.encode(token.trim())));
+    await this.put({ id: `${id}:${credentialKey}`, providerId: id, key: credentialKey, iv: [...iv], ciphertext: [...ciphertext], updatedAt: Date.now() });
   }
 
-  async read(id: IntegrationId): Promise<string | null> {
-    const record = await this.get(id);
+  async read(id: IntegrationId, key = "accessToken"): Promise<string | null> {
+    const record = await this.get(`${id}:${key}`) ?? (key === "accessToken" ? await this.get(id) : undefined);
     if (!record) return null;
     try { const plaintext = await crypto.subtle.decrypt({ name: "AES-GCM", iv: new Uint8Array(record.iv) }, await this.key(), new Uint8Array(record.ciphertext)); return decoder.decode(plaintext); } catch { throw new Error("Stored integration token could not be decrypted."); }
   }
 
-  async remove(id: IntegrationId): Promise<void> { await this.request("readwrite", (store) => store.delete(id)); }
-  async has(id: IntegrationId): Promise<boolean> { return Boolean(await this.get(id)); }
+  async remove(id: IntegrationId, key = "accessToken"): Promise<void> { await this.request("readwrite", (store) => store.delete(`${id}:${key}`)); }
+  async has(id: IntegrationId, key = "accessToken"): Promise<boolean> { return Boolean(await this.get(`${id}:${key}`)); }
 
   private async key(): Promise<CryptoKey> {
     this.keyPromise ??= this.loadOrCreateKey();

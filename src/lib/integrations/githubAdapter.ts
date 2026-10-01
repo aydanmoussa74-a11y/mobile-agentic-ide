@@ -6,6 +6,7 @@ const GRAPHQL = "https://api.github.com/graphql";
 export interface GitHubFileChange { path: string; content: string; }
 export interface GitHubCommitResult { sha: string; url: string; }
 export interface GitHubPullRequest { number: number; url: string; title: string; }
+export interface GitHubIssue { number: number; url: string; title: string; state: string; }
 
 export class GitHubAdapter {
   async cloneRepository(owner: string, repo: string, branch = "main"): Promise<GitHubFileChange[]> { const tree = await this.rest<{ tree: Array<{ path: string; type: string; sha: string }> }>(`/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`); const files: GitHubFileChange[] = []; for (const item of tree.tree.filter((entry) => entry.type === "blob")) { const blob = await this.rest<{ content: string; encoding: string }>(`/repos/${owner}/${repo}/git/blobs/${item.sha}`); files.push({ path: item.path, content: blob.encoding === "base64" ? decodeBase64(blob.content) : blob.content }); } return files; }
@@ -14,6 +15,8 @@ export class GitHubAdapter {
 
   async createBranch(owner: string, repo: string, branch: string, fromBranch = "main"): Promise<void> { const ref = await this.rest<{ object: { sha: string } }>(`/repos/${owner}/${repo}/git/ref/heads/${encodeURIComponent(fromBranch)}`); await this.rest(`/repos/${owner}/${repo}/git/refs`, "POST", { ref: `refs/heads/${branch}`, sha: ref.object.sha }); }
   async openPullRequest(owner: string, repo: string, head: string, base: string, title: string, body: string): Promise<GitHubPullRequest> { return this.rest<GitHubPullRequest>(`/repos/${owner}/${repo}/pulls`, "POST", { title, body, head, base }); }
+  async listIssues(owner: string, repo: string, state = "open"): Promise<GitHubIssue[]> { return this.rest<GitHubIssue[]>(`/repos/${owner}/${repo}/issues?state=${encodeURIComponent(state)}`); }
+  async createIssue(owner: string, repo: string, title: string, body = ""): Promise<GitHubIssue> { return this.rest<GitHubIssue>(`/repos/${owner}/${repo}/issues`, "POST", { title, body }); }
   async graphql<T = unknown>(query: string, variables: Record<string, unknown> = {}): Promise<T> { const response = await this.request(GRAPHQL, "POST", { query, variables }); return response.data as T; }
 
   private async rest<T = unknown>(path: string, method: string = "GET", body?: unknown): Promise<T> { return this.request(`${REST}${path}`, method, body) as Promise<T>; }

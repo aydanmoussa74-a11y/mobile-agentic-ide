@@ -2,7 +2,7 @@
   "project_name": "mobile-agentic-ide",
   "version": "0.1.0-alpha",
   "active_agent": "Manus (Ecosystem Integration Engine)",
-  "last_updated": "2026-10-01T15:27:00Z",
+  "last_updated": "2026-10-01T15:30:00Z",
   "current_phase": "Phase 1: Project Setup & Architecture Blueprint",
   "completed_tasks": [
     "Read AGENTS.md and the existing .agent_state.json before modifying code",
@@ -46,7 +46,11 @@
     "Implemented a browser-local AES-GCM token vault for GitHub and Google OAuth tokens with a persisted non-extractable encryption key",
     "Implemented GitHub REST and GraphQL adapters for repository tree reads, branch creation, VFS commits, and pull requests",
     "Implemented Google Docs context reads and Google Drive multipart VFS exports",
-    "Exposed guarded ecosystem tools to agents; external mutations require explicit confirm: true"
+    "Exposed guarded ecosystem tools to agents; external mutations require explicit confirm: true",
+    "Added a dynamic integration registry for baseline and future third-party or MCP-backed providers",
+    "Generalized the token vault to arbitrary provider IDs and named credentials such as accessToken and apiKey",
+    "Added a generic REST and webhook adapter for on-the-fly custom service connections",
+    "Added GitHub issue operations and Google Docs write support to the agent ecosystem tool surface"
   ],
   "current_active_task": "Review ecosystem adapters and confirmation boundaries before adding streaming feedback",
   "next_steps": [
@@ -68,7 +72,7 @@
       "Streaming agent feedback",
       "Full code editor"
     ],
-    "review_checkpoint": "Task 11 token vault, GitHub REST/GraphQL adapter, Google Docs/Drive adapter, guarded ecosystem agent tools, and confirmation boundaries complete; stop after validation and commit for review.",
+    "review_checkpoint": "Task 11 expanded dynamic integration registry, multi-provider token vault, GitHub repositories/issues/commits/PRs, Google Drive/Docs read-write, generic REST/webhooks, and guarded registry agent tools complete; stop after validation and commit for review.",
     "validation": {
       "npm_install": "passed",
       "type_check": "passed",
