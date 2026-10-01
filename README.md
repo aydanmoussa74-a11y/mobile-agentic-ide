@@ -36,6 +36,8 @@ The ecosystem integration boundary under `src/lib/integrations/` contains a brow
 
 The MCP subsystem under `src/lib/mcp/` implements JSON-RPC 2.0 `initialize`, `ping`, `tools/list`, and `tools/call`, converts the complete workspace tool registry to MCP JSON Schema, and provides an SSE/HTTP POST transport with session IDs and CORS headers. The MCP control panel exposes the endpoint and a copyable client configuration. Because a standalone browser tab cannot bind an inbound TCP port, the endpoint is a browser bridge contract that requires the deployed host, service worker host, or reverse proxy to route `/mcp` requests into `McpHttpSseTransport`; the UI reports this limitation instead of claiming public socket listening.
 
+Task 13 adds `src/lib/mcp/mcpRelay.ts` as an explicit opt-in WebSocket client. It creates a short shareable session ID, forwards relay requests into the in-browser `McpServer`, and exposes Claude Desktop and ChatGPT configuration snippets. `relay-worker/` contains a Cloudflare Worker plus Durable Object session implementation: `/ws?session=...` connects the PWA and `/mcp?session=...` accepts public HTTP/SSE MCP traffic. The public session URL is a bearer link; the control panel warns about this and disabling Relay Mode closes the browser socket and invalidates the session.
+
 ## Development
 
 ```bash

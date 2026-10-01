@@ -1,0 +1,12 @@
+name = "mobile-agentic-ide-mcp-relay"
+main = "index.ts"
+compatibility_date = "2026-10-01"
+
+[durable_objects]
+bindings = [
+  { name = "MCP_RELAY_SESSIONS", class_name = "McpRelaySession" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["McpRelaySession"]

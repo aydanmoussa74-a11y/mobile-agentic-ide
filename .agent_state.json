@@ -1,8 +1,8 @@
 {
   "project_name": "mobile-agentic-ide",
   "version": "0.1.0-alpha",
-  "active_agent": "Manus (Remote MCP Server Subsystem)",
-  "last_updated": "2026-10-01T15:40:00Z",
+  "active_agent": "Manus (WebSocket MCP Relay Bridge)",
+  "last_updated": "2026-10-01T15:58:00Z",
   "current_phase": "Phase 1: Project Setup & Architecture Blueprint",
   "completed_tasks": [
     "Read AGENTS.md and the existing .agent_state.json before modifying code",
@@ -54,9 +54,12 @@
     "Implemented MCP JSON-RPC 2.0 initialize, ping, tools/list, and tools/call methods over the complete workspace tool registry",
     "Converted VFS, Wasm, Polyglot, Test Matrix, and Ecosystem Registry tools into MCP JSON Schema definitions",
     "Implemented session-aware SSE and HTTP POST MCP transport with CORS handling",
-    "Added a mobile MCP Control Panel with server status, connected clients, handled requests, endpoint URL, and copyable configuration JSON"
+    "Added a mobile MCP Control Panel with server status, connected clients, handled requests, endpoint URL, and copyable configuration JSON",
+    "Implemented an opt-in WebSocket MCP relay client with generated shareable session IDs and live connection status",
+    "Added Claude Desktop and ChatGPT Custom Actions relay configuration copy options",
+    "Added a Cloudflare Worker and Durable Object relay under relay-worker/ for public HTTP/SSE MCP requests tunneled to browser sessions"
   ],
-  "current_active_task": "Review the MCP browser bridge and external hosting route before adding streaming feedback",
+  "current_active_task": "Review WebSocket relay deployment and public session security before adding streaming feedback",
   "next_steps": [
     "Add focused orchestration, tool-call, terminal, preview, testing, and UI tests",
     "Move model calls behind a trusted backend before production use of API keys",
@@ -72,12 +75,12 @@
       "Full application implementation",
       "Model provider or MCP integration",
       "Authentication or backend services",
-      "A standalone browser tab binding an inbound public TCP socket; MCP transport requires a reachable host or reverse proxy",
+      "A standalone browser tab binding an inbound public TCP socket; the opt-in relay requires deployment of relay-worker/",
       "Backend cloud synchronization",
       "Streaming agent feedback",
       "Full code editor"
     ],
-    "review_checkpoint": "Task 12 MCP JSON-RPC server, complete workspace schema conversion, SSE/HTTP POST transport, and mobile control panel complete; stop after validation and commit for review.",
+    "review_checkpoint": "Task 13 opt-in WebSocket relay client, shareable MCP session URL, Cloudflare Durable Object relay worker, and relay-aware control panel complete; stop after validation and commit for review.",
     "validation": {
       "npm_install": "passed",
       "type_check": "passed",
