@@ -2,16 +2,22 @@ import { createFile, listDirectories, listFiles, readFile, updateFile } from "..
 import { polyglotEngine, wasmContainer } from "../wasm";
 import { githubAdapter, googleAdapter, invokeIntegration, listIntegrations, tokenVault } from "../integrations";
 import { runVirtualTests } from "../testing";
+import { vfsHistory, switchBranch, type VfsBranchName } from "../vfs";
 import type { ToolCall, ToolDefinition } from "./types";
 
 const confirmation = { type: "boolean", description: "Must be true to authorize an external mutation." };
 export const workspaceTools: ToolDefinition[] = [
-  { name: "read_file", description: "Read one device-local workspace file by relative path.", parameters: { type: "object", properties: { path: { type: "string" } }, required: ["path"] } },
-  { name: "write_file", description: "Create or replace one device-local workspace file.", parameters: { type: "object", properties: { path: { type: "string" }, content: { type: "string" } }, required: ["path", "content"] } },
+  { name: "read_file", description: "Read one device-local workspace file by relative path. A VFS checkpoint is created first.", parameters: { type: "object", properties: { path: { type: "string" } }, required: ["path"] } },
+  { name: "write_file", description: "Create or replace one device-local workspace file. A VFS checkpoint is created first.", parameters: { type: "object", properties: { path: { type: "string" }, content: { type: "string" } }, required: ["path", "content"] } },
   { name: "list_files", description: "List device-local files and directories.", parameters: { type: "object", properties: {} } },
-  { name: "execute_command", description: "Run one supported command inside the Wasm POSIX sandbox; supports pipes and environment expansion.", parameters: { type: "object", properties: { command: { type: "string" }, env: { type: "object", additionalProperties: { type: "string" } } }, required: ["command"] } },
+  { name: "execute_command", description: "Run one supported command inside the Wasm POSIX sandbox. A VFS checkpoint is created first.", parameters: { type: "object", properties: { command: { type: "string" }, env: { type: "object", additionalProperties: { type: "string" } } }, required: ["command"] } },
   { name: "execute_code", description: "Execute JavaScript with node or the supported Python3 bridge inside the Wasm sandbox.", parameters: { type: "object", properties: { language: { type: "string", enum: ["node", "python3"] }, code: { type: "string" }, filename: { type: "string" } }, required: ["language", "code"] } },
   { name: "run_tests", description: "Run the in-browser Test Matrix against the current IndexedDB workspace.", parameters: { type: "object", properties: {} } },
+  { name: "vfs_checkpoint", description: "Create a named point-in-time snapshot of all IndexedDB files and directories.", parameters: { type: "object", properties: { label: { type: "string" } } } },
+  { name: "vfs_rollback", description: "Restore the workspace to a checkpoint snapshot, or the latest checkpoint on the active branch.", parameters: { type: "object", properties: { snapshotId: { type: "string" } } } },
+  { name: "vfs_diff", description: "Calculate unified line-by-line diffs between a checkpoint and the current workspace.", parameters: { type: "object", properties: { snapshotId: { type: "string" } } } },
+  { name: "vfs_switch_branch", description: "Switch the active lightweight virtual branch between main and experimental.", parameters: { type: "object", properties: { branch: { type: "string", enum: ["main", "experimental"] } }, required: ["branch"] } },
+  { name: "vfs_list_branches", description: "List virtual branches, their checkpoint heads, and the active branch.", parameters: { type: "object", properties: {} } },
   { name: "integration_status", description: "Check whether GitHub or Google OAuth tokens are configured locally without exposing token values.", parameters: { type: "object", properties: {} } },
   { name: "github_clone", description: "Read a GitHub repository tree into a structured result for the local workspace.", parameters: { type: "object", properties: { owner: { type: "string" }, repo: { type: "string" }, branch: { type: "string" } }, required: ["owner", "repo"] } },
   { name: "github_create_branch", description: "Create a GitHub branch. Requires explicit confirmation.", parameters: { type: "object", properties: { owner: { type: "string" }, repo: { type: "string" }, branch: { type: "string" }, fromBranch: { type: "string" }, confirm: confirmation }, required: ["owner", "repo", "branch", "confirm"] } },
@@ -26,6 +32,7 @@ export const workspaceTools: ToolDefinition[] = [
 ];
 
 export async function executeWorkspaceTool(call: ToolCall): Promise<string> {
+  if (call.name === "read_file" || call.name === "write_file" || call.name === "execute_command") await vfsHistory.checkpoint(`before ${call.name}`);
   const path = typeof call.arguments.path === "string" ? call.arguments.path : "";
   if (call.name === "read_file") { const file = await readFile(path); if (!file) throw new Error(`File not found: ${path}`); return file.content; }
   if (call.name === "write_file") { const content = typeof call.arguments.content === "string" ? call.arguments.content : ""; const existing = await readFile(path); if (existing) await updateFile(path, content); else await createFile(path, content); return `wrote ${path}`; }
@@ -33,6 +40,11 @@ export async function executeWorkspaceTool(call: ToolCall): Promise<string> {
   if (call.name === "execute_command") { if (typeof call.arguments.command !== "string") throw new Error("execute_command requires a command string"); const result = await wasmContainer.execute(call.arguments.command, { env: readEnvironment(call.arguments.env) }); if (result.exitCode !== 0) throw new Error(result.stderr || `Command exited with code ${result.exitCode}`); return result.stdout; }
   if (call.name === "execute_code") { const language = call.arguments.language === "python3" ? "python3" : call.arguments.language === "node" ? "node" : null; if (!language || typeof call.arguments.code !== "string") throw new Error("execute_code requires language=node|python3 and code"); const result = await polyglotEngine.run(language, call.arguments.code, { filename: typeof call.arguments.filename === "string" ? call.arguments.filename : language === "node" ? "index.js" : "main.py" }); if (result.exitCode !== 0) throw new Error(result.stderr || `Code exited with code ${result.exitCode}`); return result.stdout; }
   if (call.name === "run_tests") return JSON.stringify(await runVirtualTests(await listFiles()));
+  if (call.name === "vfs_checkpoint") return JSON.stringify(await vfsHistory.checkpoint(optionalString(call, "label") ?? "manual checkpoint"));
+  if (call.name === "vfs_rollback") return JSON.stringify(await vfsHistory.rollback(optionalString(call, "snapshotId")));
+  if (call.name === "vfs_diff") return JSON.stringify(await vfsHistory.diffAgainst(optionalString(call, "snapshotId")));
+  if (call.name === "vfs_switch_branch") { const branch = call.arguments.branch === "experimental" ? "experimental" : call.arguments.branch === "main" ? "main" : null; if (!branch) throw new Error("vfs_switch_branch requires branch=main|experimental"); return JSON.stringify(await switchBranch(branch)); }
+  if (call.name === "vfs_list_branches") return JSON.stringify(await vfsHistory.branches());
   if (call.name === "integration_status") return JSON.stringify({ providers: listIntegrations(), configured: { github: await tokenVault.has("github"), google: await tokenVault.has("google") } });
   if (call.name === "github_clone") return JSON.stringify(await githubAdapter.cloneRepository(stringArg(call, "owner"), stringArg(call, "repo"), optionalString(call, "branch") ?? "main"));
   if (call.name === "github_create_branch") { requireConfirmation(call); await githubAdapter.createBranch(stringArg(call, "owner"), stringArg(call, "repo"), stringArg(call, "branch"), optionalString(call, "fromBranch") ?? "main"); return `created GitHub branch ${call.arguments.branch}`; }

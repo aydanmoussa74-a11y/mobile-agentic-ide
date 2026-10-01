@@ -38,6 +38,8 @@ The MCP subsystem under `src/lib/mcp/` implements JSON-RPC 2.0 `initialize`, `pi
 
 Task 13 adds `src/lib/mcp/mcpRelay.ts` as an explicit opt-in WebSocket client. It creates a short shareable session ID, forwards relay requests into the in-browser `McpServer`, and exposes Claude Desktop and ChatGPT configuration snippets. `relay-worker/` contains a Cloudflare Worker plus Durable Object session implementation: `/ws?session=...` connects the PWA and `/mcp?session=...` accepts public HTTP/SSE MCP traffic. The public session URL is a bearer link; the control panel warns about this and disabling Relay Mode closes the browser socket and invalidates the session.
 
+Task 15 adds the in-memory-style virtual Git layer under `src/lib/vfs/`. `diffEngine.ts` calculates unified line and file-set diffs, `vfsHistory.ts` persists up to 50 branch-scoped snapshots and restores complete files/directories, and `vfsBranching.ts` maintains lightweight `main` and `experimental` branch heads in IndexedDB with the active branch in local storage. Agent `read_file`, `write_file`, and `execute_command` operations checkpoint automatically before execution. `vfs_checkpoint`, `vfs_rollback`, `vfs_diff`, `vfs_switch_branch`, and `vfs_list_branches` are exposed through the same workspace registry and therefore through MCP schemas.
+
 ## Development
 
 ```bash

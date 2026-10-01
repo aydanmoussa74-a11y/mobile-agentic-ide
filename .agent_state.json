@@ -1,8 +1,8 @@
 {
   "project_name": "mobile-agentic-ide",
   "version": "0.1.0-alpha",
-  "active_agent": "Manus (End-to-End Integration Verification)",
-  "last_updated": "2026-10-01T16:20:00Z",
+  "active_agent": "Manus (Virtual Git and Time-Travel Engine)",
+  "last_updated": "2026-10-01T16:35:00Z",
   "current_phase": "Phase 1: Project Setup & Architecture Blueprint",
   "completed_tasks": [
     "Read AGENTS.md and the existing .agent_state.json before modifying code",
@@ -62,9 +62,14 @@
     "Completed browser smoke verification of Wasm terminal process streams, Node execution, Python3 execution, Test Matrix, and sandbox benchmark telemetry",
     "Completed browser smoke verification of integration registry discovery and encrypted token vault round-trip without plaintext ciphertext storage",
     "Completed browser smoke verification of MCP initialize, tools/list, tools/call, method errors, schema coverage, and relay unavailable-endpoint fallback",
-    "Completed browser smoke verification of activated service worker cache population and standalone manifest metadata"
+    "Completed browser smoke verification of activated service worker cache population and standalone manifest metadata",
+    "Implemented unified line and file-set diff calculation for virtual history",
+    "Implemented IndexedDB-backed VFS checkpoints with automatic pre-agent-operation snapshots and one-tap rollback",
+    "Implemented lightweight persistent main and experimental virtual branches",
+    "Exposed vfs_checkpoint, vfs_rollback, vfs_diff, vfs_switch_branch, and vfs_list_branches through workspace and MCP tool schemas",
+    "Completed browser smoke verification of VFS diffs, rollback restoration, branch metadata, and MCP VFS tool exposure"
   ],
-  "current_active_task": "Project core subsystems verified; deploy relay-worker/ separately before enabling live public relay use",
+  "current_active_task": "Virtual Git and time-travel engine verified; deploy relay-worker/ separately before enabling live public relay use",
   "next_steps": [
     "Add focused orchestration, tool-call, terminal, preview, testing, and UI tests",
     "Move model calls behind a trusted backend before production use of API keys",
@@ -85,7 +90,7 @@
       "Streaming agent feedback",
       "Full code editor"
     ],
-    "review_checkpoint": "Task 14 end-to-end browser smoke verification complete across storage, Wasm/polyglot, integrations, MCP, relay fallback, service worker, and manifest; live relay remains deployment-gated.",
+    "review_checkpoint": "Task 15 unified diffs, automatic agent-operation checkpoints, rollback, main/experimental branches, workspace tool exposure, and browser smoke verification complete; live relay remains deployment-gated.",
     "validation": {
       "npm_install": "passed",
       "type_check": "passed",
@@ -93,7 +98,8 @@
       "manifest_smoke_check": "passed",
       "generated_artifacts_excluded": true,
       "browser_smoke": "passed",
-      "live_public_relay": "not run; relay-worker source is not deployed"
+      "live_public_relay": "not run; relay-worker source is not deployed",
+      "vfs_time_travel_smoke": "passed"
     }
   }
 }
