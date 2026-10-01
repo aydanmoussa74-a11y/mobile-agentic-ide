@@ -28,6 +28,8 @@ The PWA shell uses `src/sw.ts` as the service-worker source and `public/sw.js` a
 
 The terminal execution boundary under `src/lib/wasm/` uses a real `WebAssembly.Memory` instance for the sandbox address space and routes POSIX-style `read`, `write`, `stat`, and `readdir` operations to the IndexedDB virtual filesystem. `processManager.ts` owns virtual PIDs, lifecycle state, exit codes, stdin/stdout/stderr buffers, and pipeline stages. Terminal commands now execute through this process layer with `$ENV` expansion, `|` pipelines, and ANSI color parsing. Agent `execute_command` calls use the same Wasm container rather than the former simulated string helper.
 
+The polyglot layer under `src/lib/wasm/polyglotEngine.ts` provides a low-memory JavaScript/Node runtime boundary and an in-memory Python3 subset bridge, both backed by Wasm memory and the IndexedDB VFS. `moduleResolver.ts` resolves relative and local `.js`, `.mjs`, and `.py` modules with an in-memory cache. Agents can use the additional `execute_code` tool for `node` or `python3` source, while the Terminal accepts `node`, `python3`, `-e`, `-c`, and file execution forms. `SandboxBenchmark.tsx` reports live memory allocation, execution latency, VFS throughput, process counts, and isolation violations, plus a repeatable local stress run.
+
 ## Development
 
 ```bash

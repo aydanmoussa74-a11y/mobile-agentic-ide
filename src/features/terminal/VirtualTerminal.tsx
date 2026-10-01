@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { executeCommandStream } from "./virtualCommands";
 import { parseAnsi } from "./ansi";
 import { TestMatrix } from "./TestMatrix";
+import { SandboxBenchmark } from "./SandboxBenchmark";
 import type { TestRunResult } from "../../lib/testing/testRunner";
 
 interface VirtualTerminalProps { onWorkspaceChange: () => Promise<void> | void; testResult: TestRunResult | null; testsRunning: boolean; onRunTests: () => void; }
@@ -44,7 +45,8 @@ export function VirtualTerminal({ onWorkspaceChange, testResult, testsRunning, o
         <div className="input-row"><span className="terminal-prompt" aria-hidden="true">$</span><input ref={inputRef} id="terminal-command" value={command} onChange={(event) => setCommand(event.target.value)} placeholder="ls" autoComplete="off" autoCapitalize="none" spellCheck={false} /><button className="primary-button" type="submit">Run</button></div>
       </form>
       <TestMatrix result={testResult} running={testsRunning} onRun={onRunTests} />
-      <p className="scope-note">Wasm sandbox · pipes · $ENV · ANSI colors · ls · cat · mkdir · rm · node · git</p>
+      <SandboxBenchmark />
+      <p className="scope-note">Wasm sandbox · pipes · $ENV · ANSI colors · node · python3 · ls · cat · mkdir · rm · git</p>
     </section>
   );
 }

@@ -42,7 +42,7 @@ export interface ModelMessage {
 }
 
 export interface ToolDefinition {
-  name: "read_file" | "write_file" | "list_files" | "execute_command";
+  name: "read_file" | "write_file" | "list_files" | "execute_command" | "execute_code";
   description: string;
   parameters: Record<string, unknown>;
 }

@@ -8,7 +8,7 @@ export interface AgentTurnOptions { onToolOperation?: (call: import("./types").T
 
 export async function runAgentTurn(task: string, providers: ProviderConfig[], activeProviderId: ProviderId, agentState: AgentStateDocument, onStateChange?: (state: ModelState) => void, options: AgentTurnOptions = {}): Promise<AgentTurnResult> {
   const history: SessionHistoryEntry[] = [{ id: crypto.randomUUID(), role: "user", content: task, createdAt: Date.now() }];
-  const messages: ModelMessage[] = [{ role: "system", content: "You are the workspace agent. Use the provided tools to inspect and modify only the device-local project. Make the requested change, verify it with tools when useful, then summarize the completed work." }, { role: "user", content: `${task}\n\nCurrent agent ledger:\n${JSON.stringify(agentState)}` }];
+  const messages: ModelMessage[] = [{ role: "system", content: "You are the workspace agent. Use the provided tools to inspect and modify only the device-local project. You may write files, execute POSIX commands, or execute_code with node or python3 inside the Wasm sandbox. Make the requested change, verify it with tools when useful, then summarize the completed work." }, { role: "user", content: `${task}\n\nCurrent agent ledger:\n${JSON.stringify(agentState)}` }];
   let toolCalls = 0;
   let result = await callWithFailover(providers, messages, activeProviderId, onStateChange, workspaceTools);
   for (let round = 0; round < 5 && result.response.toolCalls?.length; round += 1) {

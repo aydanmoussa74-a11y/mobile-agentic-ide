@@ -58,11 +58,23 @@ textarea { min-height: 180px; resize: vertical; padding: 14px; font-family: ui-m
 .terminal-line + .terminal-line { margin-top: 5px; }
 .terminal-command { color: var(--accent); }
 .terminal-error { color: var(--danger); }
+.ansi-bold { font-weight: 800; }
+.ansi-red { color: #fda4af; }
+.ansi-green { color: #86efac; }
+.ansi-yellow { color: #fde68a; }
+.ansi-blue { color: #93c5fd; }
+.ansi-cyan { color: #67e8f9; }
 .terminal-form { margin-top: 16px; }
 .terminal-prompt { display: inline-flex; min-width: 34px; align-items: center; justify-content: center; color: var(--accent); background: #111722; border: 1px solid var(--border); border-right: 0; border-radius: 12px 0 0 12px; font: 1rem ui-monospace, SFMono-Regular, Menlo, monospace; }
 .terminal-form .input-row input { border-radius: 0; }
 .terminal-form .input-row .primary-button { border-radius: 0 12px 12px 0; }
 .test-matrix { margin-top: 20px; padding: 16px; border: 1px solid var(--border); border-radius: 16px; background: rgba(15, 23, 32, 0.52); }
+.sandbox-benchmark { margin-top: 20px; padding: 16px; border: 1px solid rgba(117, 230, 218, 0.24); border-radius: 16px; background: rgba(15, 23, 32, 0.52); }
+.benchmark-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+.benchmark-metric { min-width: 0; padding: 10px; border-radius: 10px; background: #111722; }
+.benchmark-metric span { display: block; overflow: hidden; color: var(--text-muted); font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
+.benchmark-metric strong { display: block; margin-top: 4px; overflow: hidden; color: #dbeafe; font-size: 0.8rem; text-overflow: ellipsis; white-space: nowrap; }
+.benchmark-result { margin: 12px 0 0; color: #d1fae5; font-size: 0.78rem; line-height: 1.45; }
 .test-matrix-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .test-matrix-heading h3 { margin: 3px 0 0; font-size: 1rem; }
 .matrix-summary { display: flex; align-items: center; gap: 10px; margin: 14px 0 8px; padding: 10px 12px; border-radius: 10px; font-size: 0.82rem; }
