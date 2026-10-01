@@ -3,8 +3,9 @@ import { scanText, type ScanFinding } from "../lib/security/secretScanner";
 import { processScheduler, type ScheduledProcess } from "../lib/agent/processScheduler";
 import { logStorage, type ExecutionLog } from "../lib/agent/logStorage";
 import { vfsHistory } from "../lib/vfs";
+import { streamingHandover, type StreamingChunk } from "../lib/agent/streamingHandover";
 
-export type AgentPhase = "idle" | "planning" | "reading" | "checkpointing" | "editing" | "testing" | "selfCorrecting" | "complete" | "failed";
+export type AgentPhase = "idle" | "planning" | "reading" | "checkpointing" | "editing" | "testing" | "selfCorrecting" | "complete" | "failed" | "streaming";
 
 export interface AgentActivity {
   id: string;
@@ -34,6 +35,7 @@ const PHASE_ICONS: Record<AgentPhase, string> = {
   selfCorrecting: "CORR",
   complete: "DONE",
   failed: "FAIL",
+  streaming: "STREAM",
 };
 
 const PHASE_LABELS: Record<AgentPhase, string> = {
@@ -46,6 +48,7 @@ const PHASE_LABELS: Record<AgentPhase, string> = {
   selfCorrecting: "Self-Correcting",
   complete: "Complete",
   failed: "Failed",
+  streaming: "Streaming Tokens",
 };
 
 const PHASE_COLORS: Record<AgentPhase, string> = {
@@ -58,6 +61,7 @@ const PHASE_COLORS: Record<AgentPhase, string> = {
   selfCorrecting: "#fda4af",
   complete: "#86efac",
   failed: "#fda4af",
+  streaming: "#75e6da",
 };
 
 export function AgentActivityDrawer({ isOpen, onClose, activeProvider, activeModel }: AgentActivityDrawerProps) {
@@ -67,6 +71,8 @@ export function AgentActivityDrawer({ isOpen, onClose, activeProvider, activeMod
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [dlpStatus, setDlpStatus] = useState<"safe" | "warning" | "danger">("safe");
   const [isScanning, setIsScanning] = useState(false);
+  const [streamingChunks, setStreamingChunks] = useState<StreamingChunk[]>([]);
+  const [isStreaming, setIsStreaming] = useState(false);
 
   const refreshProcesses = useCallback(async () => {
     const recentProcesses = await processScheduler.status();
@@ -75,6 +81,23 @@ export function AgentActivityDrawer({ isOpen, onClose, activeProvider, activeMod
     const recentLogs = await logStorage.listLogs(undefined, 20);
     setLogs(recentLogs);
   }, []);
+
+  // Subscribe to streaming handover
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const unsubscribe = streamingHandover.subscribe((chunk) => {
+      setStreamingChunks((prev) => [...prev, chunk]);
+      if (chunk.type === "start") {
+        setIsStreaming(true);
+      }
+      if (chunk.type === "end") {
+        setIsStreaming(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -86,7 +109,7 @@ export function AgentActivityDrawer({ isOpen, onClose, activeProvider, activeMod
   useEffect(() => {
     const newActivities: AgentActivity[] = processes.map((proc) => {
       let phase: AgentPhase = "idle";
-      if (proc.status === "running") phase = "editing";
+      if (proc.status === "running") phase = isStreaming ? "streaming" : "editing";
       else if (proc.status === "completed") phase = "complete";
       else if (proc.status === "failed") phase = "failed";
       else if (proc.status === "queued") phase = "planning";
@@ -98,12 +121,23 @@ export function AgentActivityDrawer({ isOpen, onClose, activeProvider, activeMod
         testStatus: proc.exitCode === 0 ? "pass" : proc.exitCode ? "fail" : undefined,
       };
     });
+
+    // Add streaming activity if active
+    if (isStreaming && !processes.some(p => p.status === "running")) {
+      newActivities.unshift({
+        id: "streaming",
+        phase: "streaming",
+        message: "Real-time token streaming active",
+        timestamp: Date.now(),
+      });
+    }
+
     if (newActivities.length === 0) {
       setActivities([{ id: "initial", phase: "idle", message: "Agent ready - waiting for task", timestamp: Date.now() }]);
     } else {
       setActivities(newActivities);
     }
-  }, [processes]);
+  }, [processes, isStreaming]);
 
   useEffect(() => {
     async function checkDlp() {
@@ -134,6 +168,29 @@ export function AgentActivityDrawer({ isOpen, onClose, activeProvider, activeMod
 
   const handleExpand = (id: string) => setExpandedId(expandedId === id ? null : id);
 
+  // Format streaming display
+  const streamingDisplay = streamingChunks.length > 0 ? (
+    <div className="streaming-display">
+      <div className="streaming-header">
+        <span className="streaming-label">Live Token Stream</span>
+        <span className="streaming-status">{isStreaming ? "Streaming..." : "Stream Complete"}</span>
+      </div>
+      <div className="streaming-content">
+        {streamingChunks
+          .filter(c => c.type === "delta")
+          .map((chunk, index) => (
+            <span key={index} className="streaming-chunk">
+              {chunk.content}
+            </span>
+          ))}
+      </div>
+      <div className="streaming-stats">
+        <span>{streamingChunks.length} chunks</span>
+        <span>Sequence: {streamingChunks[0]?.sequenceId}</span>
+      </div>
+    </div>
+  ) : null;
+
   if (!isOpen) return null;
 
   return (
@@ -155,6 +212,8 @@ export function AgentActivityDrawer({ isOpen, onClose, activeProvider, activeMod
           </span>
           {isScanning && <span className="dlp-scanning">Scanning...</span>}
         </div>
+
+        {isStreaming && streamingDisplay}
 
         <div className="activity-timeline">
           {activities.map((activity) => (
@@ -193,6 +252,13 @@ export function AgentActivityDrawer({ isOpen, onClose, activeProvider, activeMod
             {processes.filter(p => p.status === "running").map(proc => (
               <button key={proc.id} className="danger-button" type="button" onClick={() => void handleKillProcess(proc.id)}>Kill Process</button>
             ))}
+          </div>
+        )}
+
+        {isStreaming && (
+          <div className="streaming-info-bar">
+            <span className="streaming-icon">STREAM</span>
+            <span>Real-time token streaming is active</span>
           </div>
         )}
       </div>

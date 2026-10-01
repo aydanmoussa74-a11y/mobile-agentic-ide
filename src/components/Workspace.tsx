@@ -3,6 +3,7 @@ import type { VirtualFile } from "../lib/storage";
 import { listFiles, createFile, updateFile, deleteFile } from "../lib/storage";
 import { vfsHistory } from "../lib/vfs";
 import { FileExplorer } from "./FileExplorer";
+import { CodeEditor } from "./CodeEditor";
 
 export interface WorkspaceProps {
   files: VirtualFile[];
@@ -21,8 +22,6 @@ export function Workspace({
   activeProvider,
   activeModel,
 }: WorkspaceProps) {
-  const [draft, setDraft] = useState("");
-  const [showLineNumbers, setShowLineNumbers] = useState(true);
   const [isSaved, setIsSaved] = useState(true);
   const [showPatchReview, setShowPatchReview] = useState(false);
 
@@ -30,23 +29,24 @@ export function Workspace({
 
   useEffect(() => {
     if (selectedFile) {
-      setDraft(selectedFile.content);
       setIsSaved(true);
-    } else {
-      setDraft("");
     }
   }, [selectedFile]);
 
   const handleSave = async () => {
     if (!selectedFile) return;
     try {
-      await updateFile(selectedFile.path, draft);
       await onWorkspaceChange();
       setIsSaved(true);
     } catch (error) {
       console.error("Save failed:", error);
     }
   };
+
+  const handleContentChange = useCallback((content: string) => {
+    if (!selectedFile) return;
+    setIsSaved(false);
+  }, [selectedFile]);
 
   const handleCreateFile = async (path: string) => {
     await createFile(path, "");
@@ -62,33 +62,44 @@ export function Workspace({
     await onWorkspaceChange();
   };
 
-  const handleDraftChange = (value: string) => {
-    setDraft(value);
-    setIsSaved(false);
-  };
-
-  const handleToggleLineNumbers = () => {
-    setShowLineNumbers(!showLineNumbers);
-  };
-
   const handleTogglePatchReview = () => {
     setShowPatchReview(!showPatchReview);
   };
 
-  const handleEditorBlur = async () => {
-    if (!isSaved && selectedFile) {
-      await handleSave();
-    }
+  // Detect language from file extension
+  const detectLanguage = (file: VirtualFile | null): string => {
+    if (!file) return "text";
+    const ext = file.path.split(".").pop()?.toLowerCase() ?? "";
+    const languageMap: Record<string, string> = {
+      js: "javascript",
+      javascript: "javascript",
+      ts: "typescript",
+      typescript: "typescript",
+      tsx: "tsx",
+      jsx: "jsx",
+      html: "html",
+      css: "css",
+      json: "json",
+      md: "markdown",
+      markdown: "markdown",
+      py: "python",
+      python: "python",
+      sh: "bash",
+      bash: "bash",
+      yaml: "yaml",
+      yml: "yaml",
+      xml: "xml",
+      svg: "xml",
+      txt: "text",
+    };
+    return languageMap[ext] || "text";
   };
 
-  const getLineCount = () => draft.split("\n").length;
-  const getFileStats = () => {
-    const lines = draft.split("\n").length;
-    const chars = draft.length;
-    const size = new Blob([draft]).size;
-    return { lines, chars, size };
-  };
-  const stats = getFileStats();
+  const stats = selectedFile ? {
+    lines: selectedFile.content.split("\n").length,
+    chars: selectedFile.content.length,
+    size: new Blob([selectedFile.content]).size,
+  } : { lines: 0, chars: 0, size: 0 };
 
   return (
     <section id="workspace" className="workspace-card" aria-labelledby="workspace-title">
@@ -101,7 +112,6 @@ export function Workspace({
           <h2 id="workspace-title">{selectedFile ? selectedFile.path.split("/").pop() : "Workspace"}</h2>
         </div>
         <div className="workspace-header-actions">
-          <button className="workspace-header-button" type="button" onClick={handleToggleLineNumbers} title="Toggle line numbers">#</button>
           <button className="workspace-header-button" type="button" onClick={handleTogglePatchReview} title="Toggle Agent Patch Review">AI</button>
         </div>
       </div>
@@ -116,32 +126,23 @@ export function Workspace({
         </div>
 
         <div className="workspace-main">
-          <div className="editor-container">
-            <div className="editor-header">
-              <label htmlFor="file-editor">{selectedFile?.path ?? "Select a file"}</label>
-              <div className="editor-stats">
-                <span className="editor-stat">{stats.lines} lines</span>
-                <span className="editor-stat">{stats.chars} chars</span>
-                <span className="editor-stat">{(stats.size / 1024).toFixed(1)} KB</span>
-              </div>
+          {selectedFile ? (
+            <CodeEditor
+              file={selectedFile}
+              onChange={handleContentChange}
+              onSave={handleSave}
+              isSaved={isSaved}
+              readOnly={false}
+              language={detectLanguage(selectedFile)}
+            />
+          ) : (
+            <div className="editor-placeholder">
+              <p>Select a file from the explorer or create a new one to start editing.</p>
+              <button className="primary-button" type="button" onClick={async () => await handleCreateFile("new-file.txt")}>
+                Create New File
+              </button>
             </div>
-            
-            <div className="editor-wrapper">
-              {showLineNumbers && (
-                <div className="editor-line-numbers">
-                  {Array.from({ length: getLineCount() }, (_, i) => <span key={i} className="line-number">{i + 1}</span>)}
-                </div>
-              )}
-              
-              <textarea id="file-editor" value={draft} onChange={(event) => handleDraftChange(event.target.value)} onBlur={handleEditorBlur} disabled={!selectedFile} placeholder="File contents" spellCheck={false} className="editor-textarea" />
-            </div>
-
-            <div className="editor-actions">
-              <button className="primary-button" type="button" onClick={handleSave} disabled={!selectedFile || isSaved}>{isSaved ? "Saved" : "Save changes"}</button>
-              <button className="secondary-button" type="button" onClick={async () => { if (selectedFile) { await deleteFile(selectedFile.path); await onWorkspaceChange(); } }} disabled={!selectedFile}>Delete</button>
-              <button className="secondary-button" type="button" onClick={async () => { await vfsHistory.checkpoint(`Before editing ${selectedFile?.path}`); }} disabled={!selectedFile}>Checkpoint</button>
-            </div>
-          </div>
+          )}
 
           {showPatchReview && selectedFile && (
             <div className="patch-review-panel">

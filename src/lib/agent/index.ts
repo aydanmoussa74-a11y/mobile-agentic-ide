@@ -6,5 +6,6 @@ export { deleteProviderKey, readProviderKey, saveProviderKey } from "./providerV
 export { executeWorkspaceTool, workspaceTools } from "./workspaceTools";
 export { processScheduler, ProcessScheduler } from "./processScheduler";
 export { logStorage, LogStorage } from "./logStorage";
+export { streamingHandover, StreamingHandover, createStreamingHandoverPayload, createStreamingDisplay, formatStreamingChunk, type StreamingChunk, type StreamingState } from "./streamingHandover";
 export type { ExecutionLog, ExecutionLogKind, ProcessStatus, StoredProcess } from "./logStorage";
 export type * from "./types";
