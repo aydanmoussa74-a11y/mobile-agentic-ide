@@ -1,8 +1,8 @@
 {
   "project_name": "mobile-agentic-ide",
   "version": "0.1.0-alpha",
-  "active_agent": "Manus (Production Hardening and System Resilience)",
-  "last_updated": "2026-10-01T17:30:00Z",
+  "active_agent": "Manus (Project Loop and Safety Engine Foundation)",
+  "last_updated": "2026-10-01T19:10:00Z",
   "current_phase": "Phase 1: Project Setup & Architecture Blueprint",
   "completed_tasks": [
     "Read AGENTS.md and the existing .agent_state.json before modifying code",
@@ -80,9 +80,17 @@
     "Implemented memoryGuard timeout, abort, and memory-bound protections for POSIX and polyglot execution",
     "Added MCP relay exponential reconnect backoff capped at 30 seconds and a 15-second heartbeat loop",
     "Added secret-free system_health diagnostics for storage, Wasm, processes, vault state, and MCP status",
-    "Exposed system_health through workspace tools and registry-driven MCP schemas"
+    "Exposed system_health through workspace tools and registry-driven MCP schemas",
+    "Implemented versioned project.manifest.json runtime capabilities, entry points, and dependency schema",
+    "Implemented bounded ZIP import/export with unsafe-path, file-size, total-size, and high-severity secret checks",
+    "Implemented secretScanner detection and redaction for OpenAI, Anthropic, Gemini, GitHub, private-key, credential-assignment, and .env patterns",
+    "Applied DLP redaction to handover payloads, model dispatch prompts/tool outputs, and persisted execution logs",
+    "Implemented VFS .mocks/routes.json fixture-backed fetch interception for isolated Live Preview",
+    "Implemented checkpoint-backed workspace transactions with Test Matrix verification and rollback on failure",
+    "Exposed project_manifest, project_import_zip, and workspace_transaction through workspace tools and MCP schemas",
+    "Added mobile Workspace ZIP import control and DLP-protected project export"
   ],
-  "current_active_task": "Production hardening and system resilience verified; deploy relay-worker/ separately before enabling live public relay use",
+  "current_active_task": "Project loop and safety engine foundation verified; package catalog, conflict-aware agent overlays, and real child-agent execution remain future work",
   "next_steps": [
     "Add focused orchestration, tool-call, terminal, preview, testing, and UI tests",
     "Move model calls behind a trusted backend before production use of API keys",
@@ -103,7 +111,7 @@
       "Streaming agent feedback",
       "Full code editor"
     ],
-    "review_checkpoint": "Task 18 quota pruning, execution guards, relay resilience, system_health diagnostics, documentation, and smoke verification complete; live relay remains deployment-gated.",
+    "review_checkpoint": "Task 19 manifest/import-export, DLP scanning/redaction, local mock gateway, workspace transactions, documentation, and browser smoke verification complete; live relay remains deployment-gated.",
     "validation": {
       "npm_install": "passed",
       "type_check": "passed",
@@ -118,7 +126,13 @@
       "spawn_sub_agent_smoke": "passed",
       "system_health_smoke": "passed",
       "memory_guard_smoke": "passed",
-      "relay_resilience_smoke": "passed (backoff/heartbeat implementation inspected; live public relay remains deployment-gated)"
+      "relay_resilience_smoke": "passed (backoff/heartbeat implementation inspected; live public relay remains deployment-gated)",
+      "task19_zip_roundtrip_smoke": "passed",
+      "task19_zip_secret_rejection_smoke": "passed",
+      "task19_dlp_redaction_smoke": "passed",
+      "task19_transaction_commit_rollback_smoke": "passed",
+      "task19_mock_gateway_smoke": "passed",
+      "task19_mcp_schema_smoke": "passed"
     }
   }
 }

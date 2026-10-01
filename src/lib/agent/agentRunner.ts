@@ -1,14 +1,16 @@
 import { createFile, listFiles, readFile, updateFile } from "../storage";
 import { callWithFailover } from "./failoverHandler";
 import { executeWorkspaceTool, workspaceTools } from "./workspaceTools";
+import { redactSecrets } from "../security";
 import type { AgentStateDocument, ModelMessage, ModelState, ProviderConfig, ProviderId, SessionHistoryEntry } from "./types";
 
 export interface AgentTurnResult { text: string; modelState: ModelState; history: SessionHistoryEntry[]; toolCalls: number; }
 export interface AgentTurnOptions { onToolOperation?: (call: import("./types").ToolCall) => Promise<void> | void; }
 
 export async function runAgentTurn(task: string, providers: ProviderConfig[], activeProviderId: ProviderId, agentState: AgentStateDocument, onStateChange?: (state: ModelState) => void, options: AgentTurnOptions = {}): Promise<AgentTurnResult> {
-  const history: SessionHistoryEntry[] = [{ id: crypto.randomUUID(), role: "user", content: task, createdAt: Date.now() }];
-  const messages: ModelMessage[] = [{ role: "system", content: "You are the workspace agent. Use the provided tools to inspect and modify the device-local project. You may write files, execute POSIX commands, execute_code with node or python3, run the Test Matrix inside the Wasm sandbox, and spawn bounded child-agent tasks asynchronously with explicit prompts and allowed tool names. Child tasks return a model-neutral dispatch envelope and must be tracked with process_status and process_logs. Ecosystem tools are backed by a dynamic integration registry and can target GitHub, Google Workspace, generic REST APIs, webhooks, or future MCP providers. The same complete tool registry is exposed through the local MCP JSON-RPC bridge. GitHub branch/commit/issue/PR, Google Docs/Drive writes, and generic provider operations are external mutations and require explicit confirm: true. Never invent confirmation. Make the requested change, verify it with tools when useful, then summarize the completed work." }, { role: "user", content: `${task}\n\nCurrent agent ledger:\n${JSON.stringify(agentState)}` }];
+  const safeTask = redactSecrets(task);
+  const history: SessionHistoryEntry[] = [{ id: crypto.randomUUID(), role: "user", content: safeTask, createdAt: Date.now() }];
+  const messages: ModelMessage[] = [{ role: "system", content: "You are the workspace agent. Use the provided tools to inspect and modify the device-local project. You may write files, execute POSIX commands, execute_code with node or python3, run the Test Matrix inside the Wasm sandbox, and spawn bounded child-agent tasks asynchronously with explicit prompts and allowed tool names. Child tasks return a model-neutral dispatch envelope and must be tracked with process_status and process_logs. Ecosystem tools are backed by a dynamic integration registry and can target GitHub, Google Workspace, generic REST APIs, webhooks, or future MCP providers. The same complete tool registry is exposed through the local MCP JSON-RPC bridge. GitHub branch/commit/issue/PR, Google Docs/Drive writes, and generic provider operations are external mutations and require explicit confirm: true. Never invent confirmation. Make the requested change, verify it with tools when useful, then summarize the completed work." }, { role: "user", content: `${safeTask}\n\nCurrent agent ledger:\n${redactSecrets(JSON.stringify(agentState), ".agent_state.json")}` }];
   let toolCalls = 0;
   let result = await callWithFailover(providers, messages, activeProviderId, onStateChange, workspaceTools);
   for (let round = 0; round < 5 && result.response.toolCalls?.length; round += 1) {
@@ -17,8 +19,9 @@ export async function runAgentTurn(task: string, providers: ProviderConfig[], ac
     for (const call of calls) {
       try {
         const output = await executeWorkspaceTool(call);
-        messages.push({ role: "tool", name: call.name, toolCallId: call.id, content: output });
-        history.push({ id: crypto.randomUUID(), role: "system", content: `${call.name}: ${output}`, createdAt: Date.now() });
+        const safeOutput = redactSecrets(output);
+        messages.push({ role: "tool", name: call.name, toolCallId: call.id, content: safeOutput });
+        history.push({ id: crypto.randomUUID(), role: "system", content: `${call.name}: ${safeOutput}`, createdAt: Date.now() });
         await options.onToolOperation?.(call);
       } catch (error: unknown) {
         const output = error instanceof Error ? `Tool error: ${error.message}` : "Tool error: operation failed";

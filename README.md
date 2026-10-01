@@ -44,6 +44,8 @@ Task 16 adds `src/lib/agent/processScheduler.ts` and `logStorage.ts`. The schedu
 
 Task 18 adds production hardening under `src/lib/vfs/storageManager.ts`, `src/lib/wasm/memoryGuard.ts`, and `src/lib/system/healthCheck.ts`. Browser quota estimates are collected when supported; VFS snapshots and execution logs receive LRU pruning; POSIX and polyglot execution are bounded by timeout, abort, and memory guards; the MCP relay reconnects with capped exponential backoff and a 15-second heartbeat; and `system_health` reports secret-free storage, Wasm, process, vault, and MCP diagnostics.
 
+Task 19 adds the project loop and safety engine foundation. `projectManager.ts` validates a versioned `project.manifest.json`, imports safe ZIP archives into IndexedDB, and blocks unsafe paths, oversized files, and high-severity secret findings before export/import. `secretScanner.ts` redacts provider keys, GitHub tokens, private keys, credential assignments, and `.env` content before handovers, model dispatch, and execution logs. `workspaceTransaction.ts` checkpoints multi-file edits, runs verification, and rolls back failed changes. `.mocks/routes.json` plus VFS JSON fixtures can inject a controlled local fetch gateway into Live Preview. New project-manifest, ZIP-import, and workspace-transaction tools are available through the workspace registry and MCP schemas.
+
 ## Development
 
 ```bash

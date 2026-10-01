@@ -6,15 +6,17 @@ import type {
   SessionHistoryEntry,
 } from "./types";
 import type { VirtualFile } from "../storage";
+import { redactFiles, redactSecrets } from "../security";
 
 const FORMAT = "mobile-agentic-ide.handover.v1" as const;
 
 export function createHandoverPayload(context: HandoverContext): HandoverPromptPayload {
-  const contextJson = JSON.stringify(context, null, 2);
+  const safeContext: HandoverContext = { ...context, agentState: JSON.parse(redactSecrets(JSON.stringify(context.agentState), ".agent_state.json")) as HandoverContext["agentState"], files: redactFiles(context.files), recentTestLogs: (context.recentTestLogs ?? []).map((log) => redactSecrets(log)) };
+  const contextJson = JSON.stringify(safeContext, null, 2);
   return {
     format: FORMAT,
     createdAt: new Date().toISOString(),
-    context,
+    context: safeContext,
     messages: [
       {
         role: "system",

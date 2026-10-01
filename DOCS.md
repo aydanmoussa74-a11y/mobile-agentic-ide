@@ -37,6 +37,9 @@ Snapshots are local and branch-scoped. The history layer keeps up to 50 snapshot
 | `process_kill` | `processId` | Cancel a queued or running process. |
 | `spawn_sub_agent` | `prompt`, optional `systemInstructions`, optional `allowedTools[]` | Queue a bounded model-neutral child-task envelope and return its process ID. |
 | `system_health` | — | Collect secret-free storage, Wasm, process, vault, and MCP health metrics. |
+| `project_manifest` | — | Read the validated local `project.manifest.json` runtime and dependency declaration. |
+| `project_import_zip` | `base64` | Import a ZIP archive into IndexedDB with bounded size and secret checks. |
+| `workspace_transaction` | `changes[]` | Apply up to 50 file changes atomically, run tests, and roll back on failure. |
 
 Child tasks are asynchronous scheduler records with explicit prompt, system instruction, and tool bounds. The current client produces a `mobile-agentic-ide.child-task.v1` dispatch envelope; a trusted provider runner may consume that envelope later. Use `process_status` and `process_logs` to track it. The scheduler limits allowed tool names to 24 entries.
 
@@ -69,6 +72,15 @@ Child tasks are asynchronous scheduler records with explicit prompt, system inst
 - `vfsHistory.checkpoint(label)`, `.listSnapshots()`, `.rollback(snapshotId)`, `.diffAgainst(snapshotId)`, and `.branches()` manage local history.
 - `switchBranch("main" | "experimental")` changes the active branch.
 - `storageManager.estimate()` reads browser quota metrics when supported; `.prune()` removes snapshots beyond 50 per branch and logs beyond 100; `.maintain()` runs the same cleanup and returns metrics.
+- `createProjectManifest`, `readProjectManifest`, and `saveProjectManifest` manage the versioned `project.manifest.json` schema.
+- `importProjectZip` supports stored and browser-deflated ZIP entries, rejects unsafe paths, applies file/total size limits, and blocks high-severity secret findings by default.
+- `exportProjectZip` blocks high-severity secret findings before producing a ZIP.
+- `workspaceTransaction.apply(changes)` checkpoints, stages file changes, runs the Test Matrix, and restores the checkpoint when verification fails.
+- `buildMockScript` loads `.mocks/routes.json` and VFS JSON fixtures for the isolated Preview iframe.
+
+### `src/lib/security`
+
+`scanText`, `scanFiles`, `redactSecrets`, `redactFiles`, and `redactFile` detect or redact OpenAI, Anthropic, Gemini, GitHub, private-key, generic credential assignments, and `.env` files. Redaction is applied to handover payloads, model dispatch text, and execution logs.
 
 ### `src/lib/agent`
 

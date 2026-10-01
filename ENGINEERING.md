@@ -56,3 +56,9 @@ Prefer lazy work, bounded queues, small payloads, and one IndexedDB transaction 
 `src/lib/vfs/storageManager.ts` reads `navigator.storage.estimate()` when available and prunes VFS history to 50 snapshots per branch plus the oldest execution logs beyond 100 records. VFS checkpoints already invoke branch pruning; log writes invoke asynchronous LRU cleanup. `src/lib/wasm/memoryGuard.ts` bounds POSIX and polyglot executions with a default 10-second timeout and 16 MiB combined Wasm-memory limit, while preserving abort signals and returning guarded failures instead of destabilizing the tab.
 
 The MCP relay reconnects with exponential delays of 1, 2, 4 seconds up to 30 seconds and sends a heartbeat every 15 seconds while live. `src/lib/system/healthCheck.ts` provides a secret-free snapshot of quota metrics, Wasm memory and process metrics, scheduler counts, provider vault presence, and MCP server/relay status through `system_health`.
+
+## Task 19 Project Loop and Safety Engine
+
+`src/lib/vfs/projectManager.ts` owns the versioned `project.manifest.json` schema, bounded ZIP import/export, unsafe-path rejection, and secret-gated project portability. `workspaceTransaction.ts` checkpoints before multi-file writes, stages changes into the IndexedDB VFS, runs the Test Matrix, and rolls back when verification fails. `mockGateway.ts` turns `.mocks/routes.json` plus VFS JSON fixtures into a controlled fetch interceptor injected into the isolated Preview iframe.
+
+`src/lib/security/secretScanner.ts` provides secret detection and redaction for provider-key patterns, GitHub tokens, private keys, credential assignments, and `.env` files. Handover payloads, model dispatch text, and persisted execution logs use redacted values. This is a defense-in-depth scanner, not a guarantee that arbitrary secrets can be identified.

@@ -6,3 +6,9 @@ export { getBranch, getCurrentBranch, listBranches, switchBranch, updateBranchHe
 export type { VfsBranch, VfsBranchName } from "./vfsBranching";
 export { storageManager, StorageManager, SNAPSHOT_LIMIT, LOG_LIMIT } from "./storageManager";
 export type { StorageEstimate, PruneResult } from "./storageManager";
+export { createProjectManifest, exportProjectZip, importProjectZip, readProjectManifest, saveProjectManifest, PROJECT_MANIFEST_PATH, PROJECT_MANIFEST_VERSION } from "./projectManager";
+export type { ImportLimits, ImportResult, ProjectManifest, RuntimeCapability } from "./projectManager";
+export { workspaceTransaction, WorkspaceTransaction } from "./workspaceTransaction";
+export type { FileChange, WorkspaceTransactionResult } from "./workspaceTransaction";
+export { buildMockScript, loadMockGateway, MOCK_ROUTES_PATH } from "./mockGateway";
+export type { MockGatewaySnapshot, MockRoute, MockRouteConfig } from "./mockGateway";

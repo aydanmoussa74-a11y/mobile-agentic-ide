@@ -6,6 +6,10 @@ All entries describe modular milestones in the mobile-agentic-ide project. Dates
 
 Added browser quota estimation and automatic LRU pruning for VFS snapshots and execution logs. Added Wasm/polyglot timeout, abort, and memory guards. Added MCP relay exponential reconnect backoff capped at 30 seconds plus 15-second heartbeats. Added secret-free `system_health` diagnostics for storage, Wasm, processes, provider vault state, and MCP tunnel status.
 
+## Task 19 — Project Loop and Safety Engine Foundation
+
+Added a versioned `project.manifest.json`, bounded ZIP import/export with unsafe-path and secret checks, a secret/DLP scanner with redaction at handover, model-dispatch, and log boundaries, a VFS fixture-backed mock API gateway for Preview, and checkpoint-backed atomic workspace transactions with rollback on failed verification. Exposed project import, manifest, and transaction capabilities through workspace and MCP tools.
+
 ## Task 17 — Repository Documentation and Native Child Tasks
 
 - Added `spawn_sub_agent` to the workspace and registry-driven MCP tool surface.
