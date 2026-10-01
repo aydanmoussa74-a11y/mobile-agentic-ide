@@ -1,8 +1,8 @@
 {
   "project_name": "mobile-agentic-ide",
   "version": "0.1.0-alpha",
-  "active_agent": "Manus (WebSocket MCP Relay Bridge)",
-  "last_updated": "2026-10-01T15:58:00Z",
+  "active_agent": "Manus (End-to-End Integration Verification)",
+  "last_updated": "2026-10-01T16:20:00Z",
   "current_phase": "Phase 1: Project Setup & Architecture Blueprint",
   "completed_tasks": [
     "Read AGENTS.md and the existing .agent_state.json before modifying code",
@@ -57,9 +57,14 @@
     "Added a mobile MCP Control Panel with server status, connected clients, handled requests, endpoint URL, and copyable configuration JSON",
     "Implemented an opt-in WebSocket MCP relay client with generated shareable session IDs and live connection status",
     "Added Claude Desktop and ChatGPT Custom Actions relay configuration copy options",
-    "Added a Cloudflare Worker and Durable Object relay under relay-worker/ for public HTTP/SSE MCP requests tunneled to browser sessions"
+    "Added a Cloudflare Worker and Durable Object relay under relay-worker/ for public HTTP/SSE MCP requests tunneled to browser sessions",
+    "Completed browser smoke verification of IndexedDB file and tree operations with reload persistence",
+    "Completed browser smoke verification of Wasm terminal process streams, Node execution, Python3 execution, Test Matrix, and sandbox benchmark telemetry",
+    "Completed browser smoke verification of integration registry discovery and encrypted token vault round-trip without plaintext ciphertext storage",
+    "Completed browser smoke verification of MCP initialize, tools/list, tools/call, method errors, schema coverage, and relay unavailable-endpoint fallback",
+    "Completed browser smoke verification of activated service worker cache population and standalone manifest metadata"
   ],
-  "current_active_task": "Review WebSocket relay deployment and public session security before adding streaming feedback",
+  "current_active_task": "Project core subsystems verified; deploy relay-worker/ separately before enabling live public relay use",
   "next_steps": [
     "Add focused orchestration, tool-call, terminal, preview, testing, and UI tests",
     "Move model calls behind a trusted backend before production use of API keys",
@@ -80,13 +85,15 @@
       "Streaming agent feedback",
       "Full code editor"
     ],
-    "review_checkpoint": "Task 13 opt-in WebSocket relay client, shareable MCP session URL, Cloudflare Durable Object relay worker, and relay-aware control panel complete; stop after validation and commit for review.",
+    "review_checkpoint": "Task 14 end-to-end browser smoke verification complete across storage, Wasm/polyglot, integrations, MCP, relay fallback, service worker, and manifest; live relay remains deployment-gated.",
     "validation": {
       "npm_install": "passed",
       "type_check": "passed",
       "production_build": "passed",
       "manifest_smoke_check": "passed",
-      "generated_artifacts_excluded": true
+      "generated_artifacts_excluded": true,
+      "browser_smoke": "passed",
+      "live_public_relay": "not run; relay-worker source is not deployed"
     }
   }
 }
