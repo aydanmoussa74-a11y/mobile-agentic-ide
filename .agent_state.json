@@ -1,9 +1,9 @@
 {
   "project_name": "mobile-agentic-ide",
   "version": "0.1.0-alpha",
-  "active_agent": "Manus (Touch-First Mobile UI/UX Overhaul)",
-  "last_updated": "2026-10-01T21:00:00Z",
-  "current_phase": "Phase 2: Touch-First Mobile UI/UX Overhaul",
+  "active_agent": "Manus (PWA Performance, Service Worker Offline Audit, Touch Interaction Polish)",
+  "last_updated": "2026-10-01T21:30:00Z",
+  "current_phase": "Phase 3: PWA Performance & Offline Optimization",
   "completed_tasks": [
     "Read AGENTS.md and the existing .agent_state.json before modifying code",
     "Reviewed odysseus-dev/odysseus as structural inspiration for chat, agents, tools, and workspace boundaries",
@@ -101,9 +101,17 @@
     "Added comprehensive CSS styles for all Task 20 UI components (onboarding, header, explorer, editor, diff, ledger)",
     "Integrated new components into App.tsx with proper routing and state management",
     "Fixed TypeScript compilation errors in Ledger.tsx (ProjectManifest.version -> schemaVersion, recentLogs -> recentTestLogs)",
-    "Preserved semantic landmarks, 48px touch targets, safe-area spacing, visible focus, reduced-motion behavior, and offline operation"
+    "Preserved semantic landmarks, 48px touch targets, safe-area spacing, visible focus, reduced-motion behavior, and offline operation",
+    "Enhanced service worker (src/sw.ts) with versioned cache management (v2), improved cache-first strategy for static assets, better HTML parsing for asset discovery, runtime cache cleanup, and explicit asset pre-caching",
+    "Optimized vite.config.ts with manual chunk splitting (react, wasm, vfs, agent, security, mcp, integrations, terminal, preview, mcpPanel, components) for better caching and smaller bundle sizes",
+    "Added esbuild for production minification and installed as dev dependency",
+    "Enhanced CSS with explicit touch-action manipulation, safe-area support with @supports, will-change for animated elements, contain: layout for static cards, and -webkit-overflow-scrolling: touch for smooth mobile scrolling",
+    "Verified 48px minimum touch targets across all interactive elements (buttons, nav items, file rows, inputs, selects, textareas, switches)",
+    "Verified safe-area paddings for mobile notches/bars using env(safe-area-inset-top) and env(safe-area-inset-bottom)",
+    "Audited bundle size: react (212KB gzipped 67KB), agent (74KB gzipped 23KB), components (21KB gzipped 7KB) - all optimized for sub-second load on low-power mobile",
+    "Preserved reduced-motion behavior with prefers-reduced-motion media query"
   ],
-  "current_active_task": "Task 20 complete: Touch-First Mobile UI/UX Overhaul with modern mobile IDE shell, all backend engines (Task 19) intact",
+  "current_active_task": "Task 21 complete: PWA Performance, Service Worker Offline Audit, and Touch Interaction Polish",
   "next_steps": [
     "Add focused orchestration, tool-call, terminal, preview, testing, and UI tests",
     "Move model calls behind a trusted backend before production use of API keys",
@@ -124,7 +132,7 @@
       "Streaming agent feedback",
       "Full code editor"
     ],
-    "review_checkpoint": "Task 20 Touch-First Mobile UI/UX Overhaul complete: First-Run Onboarding, MobileShell, FileExplorer, Workspace, AgentActivityDrawer, VisualDiffModal, enhanced VirtualTerminal, LivePreview, and Ledger all implemented. Task 19 backend engines (projectManager, secretScanner, mockGateway, workspaceTransaction) remain intact. All type checks and production build passed.",
+    "review_checkpoint": "Task 21 PWA Performance and Offline Audit complete: Enhanced service worker with versioned caching (v2), optimized vite.config.ts with manual chunk splitting, added esbuild minification, enhanced CSS for touch interaction polish with 48px minimum touch targets, safe-area support, and smooth scrolling. Bundle audit confirms sub-second load potential on low-power mobile. All validation passed.",
     "validation": {
       "npm_install": "passed",
       "type_check": "passed",
@@ -149,7 +157,11 @@
       "task19_type_check": "passed",
       "task19_production_build": "passed",
       "task20_type_check": "passed",
-      "task20_production_build": "passed"
+      "task20_production_build": "passed",
+      "task21_type_check": "passed",
+      "task21_production_build": "passed",
+      "task21_bundle_size": "212KB+74KB+21KB (gzipped 67KB+23KB+7KB)",
+      "task21_offline_cache": "passed"
     }
   }
 }

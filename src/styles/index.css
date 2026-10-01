@@ -5,6 +5,8 @@
 * { box-sizing: border-box; }
 html, body, #root { min-height: 100%; margin: 0; }
 body { min-width: 320px; background: #10131a; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 button, a, input, textarea, select { font: inherit; }
 a { color: inherit; text-decoration: none; }
 button { -webkit-tap-highlight-color: transparent; }
@@ -33,6 +35,7 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 .input-row { display: flex; gap: 8px; }
 input, textarea, select { width: 100%; border: 1px solid var(--border); border-radius: 12px; color: #f8fafc; background: #111722; }
 input, select { min-height: 48px; padding: 0 14px; }
+button, .nav-item, .file-row, input, select, textarea, .switch-label, .icon-button, .primary-button, .secondary-button, .danger-button, .handover-button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 select { margin-bottom: 4px; }
 .file-workspace { display: grid; gap: 16px; margin-top: 28px; }
 .file-list, .editor-panel, .ledger-state { min-width: 0; padding: 16px; border: 1px solid var(--border); border-radius: 16px; background: rgba(15, 23, 32, 0.52); }
@@ -121,3 +124,24 @@ textarea { min-height: 180px; resize: vertical; padding: 14px; font-family: ui-m
 .nav-item-active { color: #e2e8f0; background: var(--surface-muted); }
 @media (min-width: 700px) { .top-bar { padding-right: 32px; padding-left: 32px; } .main-surface { padding: 48px 32px; } .file-workspace { grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1.2fr); align-items: start; } .ledger-state { grid-template-columns: repeat(3, 1fr); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; } }
+
+/* Touch target validation - ensure 48px minimum */
+.touch-target-min { min-width: 48px; min-height: 48px; }
+
+/* Safe area enhancements */
+@supports (padding: max(env(safe-area-inset-top))) {
+  .app-shell { padding-top: calc(16px + env(safe-area-inset-top)); }
+  .bottom-nav { padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+}
+
+/* Performance: will-change for animated elements */
+.primary-button, .nav-item, .file-row { will-change: transform; }
+
+/* Performance: contain layout for static cards */
+.workspace-card, .mcp-card, .ledger-card { contain: layout; }
+
+/* Smooth scrolling for touch devices */
+.main-surface, .file-list, .editor-panel, .terminal-output { 
+  -webkit-overflow-scrolling: touch; 
+  overflow-scrolling: touch; 
+}
