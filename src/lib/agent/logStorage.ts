@@ -1,6 +1,6 @@
 export type ProcessStatus = "queued" | "running" | "completed" | "failed" | "cancelled";
 export type ExecutionLogKind = "tool" | "stdout" | "stderr" | "status" | "error";
-export interface StoredProcess { id: string; command: string; status: ProcessStatus; queuedAt: number; startedAt?: number; finishedAt?: number; exitCode?: number | null; error?: string; env?: Record<string, string>; }
+export interface StoredProcess { id: string; command: string; status: ProcessStatus; queuedAt: number; startedAt?: number; finishedAt?: number; exitCode?: number | null; error?: string; env?: Record<string, string>; taskType?: "command" | "sub-agent"; prompt?: string; systemInstructions?: string; allowedTools?: string[]; }
 export interface ExecutionLog { id: string; processId: string; timestamp: number; kind: ExecutionLogKind; message: string; metadata?: Record<string, unknown>; }
 
 const DATABASE = "mobile-agentic-ide-agent-runtime";

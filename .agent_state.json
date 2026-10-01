@@ -1,8 +1,8 @@
 {
   "project_name": "mobile-agentic-ide",
   "version": "0.1.0-alpha",
-  "active_agent": "Manus (Background Process Scheduler and Log Vault)",
-  "last_updated": "2026-10-01T16:50:00Z",
+  "active_agent": "Manus (Native Child-Agent Tasks and Repository Documentation)",
+  "last_updated": "2026-10-01T17:00:00Z",
   "current_phase": "Phase 1: Project Setup & Architecture Blueprint",
   "completed_tasks": [
     "Read AGENTS.md and the existing .agent_state.json before modifying code",
@@ -71,9 +71,13 @@
     "Implemented a bounded non-blocking processScheduler with queued, running, completed, failed, cancelled states and kill signals",
     "Implemented IndexedDB logStorage for process records and structured tool, status, stdout, stderr, and error logs",
     "Exposed process_schedule, process_status, process_logs, and process_kill through workspace tools and registry-driven MCP schemas",
-    "Completed browser smoke verification of scheduling, completion logs, cancellation, MCP process tools, and post-refresh log persistence"
+    "Completed browser smoke verification of scheduling, completion logs, cancellation, MCP process tools, and post-refresh log persistence",
+    "Implemented native spawn_sub_agent scheduling with bounded prompt, system instruction, and allowed-tool metadata",
+    "Added model-neutral child-task dispatch envelopes and child-task lifecycle logging through processScheduler",
+    "Added root AGENTS.md, ENGINEERING.md, CONTRIBUTION.md, DOCS.md, and CHANGELOG.md documentation",
+    "Completed browser smoke verification of child-task metadata, asynchronous completion, envelope logs, and MCP spawn_sub_agent exposure"
   ],
-  "current_active_task": "Background scheduler and log vault verified; deploy relay-worker/ separately before enabling live public relay use",
+  "current_active_task": "Native child-task scheduling and repository documentation verified; deploy relay-worker/ separately before enabling live public relay use",
   "next_steps": [
     "Add focused orchestration, tool-call, terminal, preview, testing, and UI tests",
     "Move model calls behind a trusted backend before production use of API keys",
@@ -94,7 +98,7 @@
       "Streaming agent feedback",
       "Full code editor"
     ],
-    "review_checkpoint": "Task 16 scheduler queue, cancellation, persistent process/log vault, workspace/MCP tools, and post-refresh browser smoke verification complete; live relay remains deployment-gated.",
+    "review_checkpoint": "Task 17 bounded spawn_sub_agent scheduling, repository documentation, workspace/MCP exposure, and browser smoke verification complete; live relay remains deployment-gated.",
     "validation": {
       "npm_install": "passed",
       "type_check": "passed",
@@ -105,7 +109,8 @@
       "live_public_relay": "not run; relay-worker source is not deployed",
       "vfs_time_travel_smoke": "passed",
       "process_scheduler_smoke": "passed",
-      "process_log_reload_smoke": "passed"
+      "process_log_reload_smoke": "passed",
+      "spawn_sub_agent_smoke": "passed"
     }
   }
 }
