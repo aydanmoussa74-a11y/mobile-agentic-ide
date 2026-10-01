@@ -1,6 +1,7 @@
 import { createFile, listDirectories, listFiles, readFile, updateFile } from "../storage";
 import { polyglotEngine, wasmContainer } from "../wasm";
 import { githubAdapter, googleAdapter, invokeIntegration, listIntegrations, tokenVault } from "../integrations";
+import { runVirtualTests } from "../testing";
 import type { ToolCall, ToolDefinition } from "./types";
 
 const confirmation = { type: "boolean", description: "Must be true to authorize an external mutation." };
@@ -10,6 +11,7 @@ export const workspaceTools: ToolDefinition[] = [
   { name: "list_files", description: "List device-local files and directories.", parameters: { type: "object", properties: {} } },
   { name: "execute_command", description: "Run one supported command inside the Wasm POSIX sandbox; supports pipes and environment expansion.", parameters: { type: "object", properties: { command: { type: "string" }, env: { type: "object", additionalProperties: { type: "string" } } }, required: ["command"] } },
   { name: "execute_code", description: "Execute JavaScript with node or the supported Python3 bridge inside the Wasm sandbox.", parameters: { type: "object", properties: { language: { type: "string", enum: ["node", "python3"] }, code: { type: "string" }, filename: { type: "string" } }, required: ["language", "code"] } },
+  { name: "run_tests", description: "Run the in-browser Test Matrix against the current IndexedDB workspace.", parameters: { type: "object", properties: {} } },
   { name: "integration_status", description: "Check whether GitHub or Google OAuth tokens are configured locally without exposing token values.", parameters: { type: "object", properties: {} } },
   { name: "github_clone", description: "Read a GitHub repository tree into a structured result for the local workspace.", parameters: { type: "object", properties: { owner: { type: "string" }, repo: { type: "string" }, branch: { type: "string" } }, required: ["owner", "repo"] } },
   { name: "github_create_branch", description: "Create a GitHub branch. Requires explicit confirmation.", parameters: { type: "object", properties: { owner: { type: "string" }, repo: { type: "string" }, branch: { type: "string" }, fromBranch: { type: "string" }, confirm: confirmation }, required: ["owner", "repo", "branch", "confirm"] } },
@@ -30,6 +32,7 @@ export async function executeWorkspaceTool(call: ToolCall): Promise<string> {
   if (call.name === "list_files") { const [files, directories] = await Promise.all([listFiles(), listDirectories()]); return JSON.stringify({ files: files.map((file) => file.path), directories }); }
   if (call.name === "execute_command") { if (typeof call.arguments.command !== "string") throw new Error("execute_command requires a command string"); const result = await wasmContainer.execute(call.arguments.command, { env: readEnvironment(call.arguments.env) }); if (result.exitCode !== 0) throw new Error(result.stderr || `Command exited with code ${result.exitCode}`); return result.stdout; }
   if (call.name === "execute_code") { const language = call.arguments.language === "python3" ? "python3" : call.arguments.language === "node" ? "node" : null; if (!language || typeof call.arguments.code !== "string") throw new Error("execute_code requires language=node|python3 and code"); const result = await polyglotEngine.run(language, call.arguments.code, { filename: typeof call.arguments.filename === "string" ? call.arguments.filename : language === "node" ? "index.js" : "main.py" }); if (result.exitCode !== 0) throw new Error(result.stderr || `Code exited with code ${result.exitCode}`); return result.stdout; }
+  if (call.name === "run_tests") return JSON.stringify(await runVirtualTests(await listFiles()));
   if (call.name === "integration_status") return JSON.stringify({ providers: listIntegrations(), configured: { github: await tokenVault.has("github"), google: await tokenVault.has("google") } });
   if (call.name === "github_clone") return JSON.stringify(await githubAdapter.cloneRepository(stringArg(call, "owner"), stringArg(call, "repo"), optionalString(call, "branch") ?? "main"));
   if (call.name === "github_create_branch") { requireConfirmation(call); await githubAdapter.createBranch(stringArg(call, "owner"), stringArg(call, "repo"), stringArg(call, "branch"), optionalString(call, "fromBranch") ?? "main"); return `created GitHub branch ${call.arguments.branch}`; }

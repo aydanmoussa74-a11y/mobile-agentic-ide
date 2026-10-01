@@ -42,7 +42,7 @@ export interface ModelMessage {
 }
 
 export interface ToolDefinition {
-  name: "read_file" | "write_file" | "list_files" | "execute_command" | "execute_code" | "integration_status" | "github_clone" | "github_create_branch" | "github_commit_vfs" | "github_open_pr" | "google_read_doc" | "google_write_doc" | "google_export_vfs" | "github_list_issues" | "github_create_issue" | "integration_request";
+  name: "read_file" | "write_file" | "list_files" | "execute_command" | "execute_code" | "run_tests" | "integration_status" | "github_clone" | "github_create_branch" | "github_commit_vfs" | "github_open_pr" | "google_read_doc" | "google_write_doc" | "google_export_vfs" | "github_list_issues" | "github_create_issue" | "integration_request";
   description: string;
   parameters: Record<string, unknown>;
 }

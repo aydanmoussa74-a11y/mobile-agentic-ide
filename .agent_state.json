@@ -1,8 +1,8 @@
 {
   "project_name": "mobile-agentic-ide",
   "version": "0.1.0-alpha",
-  "active_agent": "Manus (Ecosystem Integration Engine)",
-  "last_updated": "2026-10-01T15:30:00Z",
+  "active_agent": "Manus (Remote MCP Server Subsystem)",
+  "last_updated": "2026-10-01T15:40:00Z",
   "current_phase": "Phase 1: Project Setup & Architecture Blueprint",
   "completed_tasks": [
     "Read AGENTS.md and the existing .agent_state.json before modifying code",
@@ -50,9 +50,13 @@
     "Added a dynamic integration registry for baseline and future third-party or MCP-backed providers",
     "Generalized the token vault to arbitrary provider IDs and named credentials such as accessToken and apiKey",
     "Added a generic REST and webhook adapter for on-the-fly custom service connections",
-    "Added GitHub issue operations and Google Docs write support to the agent ecosystem tool surface"
+    "Added GitHub issue operations and Google Docs write support to the agent ecosystem tool surface",
+    "Implemented MCP JSON-RPC 2.0 initialize, ping, tools/list, and tools/call methods over the complete workspace tool registry",
+    "Converted VFS, Wasm, Polyglot, Test Matrix, and Ecosystem Registry tools into MCP JSON Schema definitions",
+    "Implemented session-aware SSE and HTTP POST MCP transport with CORS handling",
+    "Added a mobile MCP Control Panel with server status, connected clients, handled requests, endpoint URL, and copyable configuration JSON"
   ],
-  "current_active_task": "Review ecosystem adapters and confirmation boundaries before adding streaming feedback",
+  "current_active_task": "Review the MCP browser bridge and external hosting route before adding streaming feedback",
   "next_steps": [
     "Add focused orchestration, tool-call, terminal, preview, testing, and UI tests",
     "Move model calls behind a trusted backend before production use of API keys",
@@ -68,11 +72,12 @@
       "Full application implementation",
       "Model provider or MCP integration",
       "Authentication or backend services",
+      "A standalone browser tab binding an inbound public TCP socket; MCP transport requires a reachable host or reverse proxy",
       "Backend cloud synchronization",
       "Streaming agent feedback",
       "Full code editor"
     ],
-    "review_checkpoint": "Task 11 expanded dynamic integration registry, multi-provider token vault, GitHub repositories/issues/commits/PRs, Google Drive/Docs read-write, generic REST/webhooks, and guarded registry agent tools complete; stop after validation and commit for review.",
+    "review_checkpoint": "Task 12 MCP JSON-RPC server, complete workspace schema conversion, SSE/HTTP POST transport, and mobile control panel complete; stop after validation and commit for review.",
     "validation": {
       "npm_install": "passed",
       "type_check": "passed",

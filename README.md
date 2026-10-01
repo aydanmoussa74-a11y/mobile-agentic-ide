@@ -34,6 +34,8 @@ The ecosystem integration boundary under `src/lib/integrations/` contains a brow
 
 `registry.ts` provides dynamic provider registration for GitHub, GitLab, Google Workspace, Notion, Linear, Slack, Supabase, Vercel, or future MCP-backed services without changing the agent loop. `genericHttpAdapter.ts` supports provider-scoped REST calls and webhooks. The baseline registry registers GitHub, Google Workspace, and Generic HTTP; additional providers can register an id, capabilities, and an `invoke` implementation at runtime. The token vault supports arbitrary provider IDs and named credentials such as `accessToken` or `apiKey`.
 
+The MCP subsystem under `src/lib/mcp/` implements JSON-RPC 2.0 `initialize`, `ping`, `tools/list`, and `tools/call`, converts the complete workspace tool registry to MCP JSON Schema, and provides an SSE/HTTP POST transport with session IDs and CORS headers. The MCP control panel exposes the endpoint and a copyable client configuration. Because a standalone browser tab cannot bind an inbound TCP port, the endpoint is a browser bridge contract that requires the deployed host, service worker host, or reverse proxy to route `/mcp` requests into `McpHttpSseTransport`; the UI reports this limitation instead of claiming public socket listening.
+
 ## Development
 
 ```bash
