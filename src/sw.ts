@@ -1,19 +1,20 @@
 // @ts-nocheck
 const CACHE_NAME = "mobile-agentic-ide-shell-v2";
 const CACHE_VERSION = "v2::2026-10-01";
+const BASE_PATH = "/mobile-agentic-ide/";
 
 // Core assets that must always be cached
 const CORE_ASSETS = [
-  "/",
-  "/manifest.webmanifest",
-  "/icons/icon.svg",
-  "/robots.txt",
+  BASE_PATH,
+  BASE_PATH + "manifest.webmanifest",
+  BASE_PATH + "icons/icon.svg",
+  BASE_PATH + "robots.txt",
 ];
 
 // Static asset patterns to cache for offline use
 const STATIC_PATTERNS = [
-  /\/assets\/.*\.(js|css|woff2?|png|svg|jpg|jpeg|gif)$/,
-  /\/sw\.js$/,
+  /\/mobile-agentic-ide\/assets\/.*\.(js|css|woff2?|png|svg|jpg|jpeg|gif)$/,
+  /\/mobile-agentic-ide\/sw\.js$/,
 ];
 
 // Runtime cache for API/data requests (separate from static cache)
@@ -62,7 +63,7 @@ self.addEventListener("fetch", (event) => {
       caches.match(request).then((cached) => {
         if (cached) return cached;
         // Fallback to shell
-        return caches.match("/").then((shell) => shell || fetch(request));
+        return caches.match(BASE_PATH).then((shell) => shell || fetch(request));
       })
     );
     return;
@@ -93,7 +94,7 @@ self.addEventListener("fetch", (event) => {
   // Default: network-first with cache fallback
   event.respondWith(
     fetch(request).catch(() => {
-      return caches.match(request).then((cached) => cached || caches.match("/"));
+      return caches.match(request).then((cached) => cached || caches.match(BASE_PATH));
     })
   );
 });
@@ -112,13 +113,13 @@ async function precacheShell() {
   );
 
   // Fetch and cache the shell HTML
-  const shell = await fetch("/", { cache: "no-store" });
+  const shell = await fetch(BASE_PATH, { cache: "no-store" });
   if (!shell.ok) {
     console.warn("[SW] Failed to fetch shell");
     return;
   }
 
-  await cache.put("/", shell.clone());
+  await cache.put(BASE_PATH, shell.clone());
 
   // Parse HTML to discover all assets
   const html = await shell.text();
@@ -134,8 +135,8 @@ async function precacheShell() {
 
   // Add common asset paths that might be missing
   const additionalAssets = [
-    "/assets/index-JEWyAWQc.css",
-    "/assets/index-9cUcFcfe.js",
+    "/mobile-agentic-ide/assets/index-JEWyAWQc.css",
+    "/mobile-agentic-ide/assets/index-9cUcFcfe.js",
   ];
 
   const allAssets = [...new Set([...discovered, ...additionalAssets])];
