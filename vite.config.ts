@@ -2,10 +2,15 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
+  // Project site: https://aydanmoussa74-a11y.github.io/mobile-agentic-ide/
+  // Use the repo subpath so built script/css URLs resolve on GitHub Pages.
+  // `base: "./"` also works if the app is only ever opened from that folder.
   base: "/mobile-agentic-ide/",
   plugins: [react()],
   server: { allowedHosts: true },
   build: {
+    outDir: "dist",
+    emptyOutDir: true,
     target: "es2022",
     // Optimize for mobile - smaller chunks
     chunkSizeWarningLimit: 500,
