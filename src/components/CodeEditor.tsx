@@ -194,6 +194,13 @@ export function CodeEditor({ file, onChange, onSave, isSaved, readOnly = false, 
 
   const stats = getFileStats();
 
+  const insertSymbol = (symbol: string) => {
+    if (readOnly) return;
+    editorRef.current?.focus();
+    document.execCommand("insertText", false, symbol);
+    onChange(editorRef.current?.innerText ?? `${content}${symbol}`);
+  };
+
   // Generate highlighted HTML
   const highlightedHtml = highlightCode(content, detectedLanguage());
 
@@ -239,6 +246,11 @@ export function CodeEditor({ file, onChange, onSave, isSaved, readOnly = false, 
         <button className="primary-button" type="button" onClick={onSave} disabled={isSaved}>
           {isSaved ? "Saved" : "Save changes"}
         </button>
+      </div>
+      <div className="quick-keys" aria-label="Symbol keys">
+        {["{", "}", "[", "]", "(", ")", "<", ">", ";", "=", "/", "!"].map((symbol) => (
+          <button key={symbol} type="button" onClick={() => insertSymbol(symbol)}>{symbol}</button>
+        ))}
       </div>
     </div>
   );

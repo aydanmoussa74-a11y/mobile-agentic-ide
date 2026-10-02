@@ -1,6 +1,8 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { Bell, Eye, Folder, Play, Plus, Settings, Terminal, User } from "lucide-react";
 import { FirstRunOnboarding, type OnboardingOption } from "./FirstRunOnboarding";
 import { SettingsSheet, type SettingsTab } from "./SettingsSheet";
+import { QuickActionSheet } from "./QuickActionSheet";
 
 export type AppTab = "agent" | "files" | "preview" | "terminal";
 
@@ -16,7 +18,11 @@ interface MobileShellProps {
   searchQuery: string;
   onSearchQueryChange: (value: string) => void;
   onSearch: (query: string) => void;
-  onQuickCreate: () => void;
+  onNewFile: (path: string) => Promise<void>;
+  onNewFolder: (path: string) => Promise<void>;
+  onImportZip: () => void;
+  onImportGithub: (owner: string, repo: string) => Promise<void>;
+  onExportZip: () => void;
   notifications: Notice[];
   settingsTab: SettingsTab;
   onSettingsTabChange: (tab: SettingsTab) => void;
@@ -35,21 +41,10 @@ const TABS: Array<{ id: AppTab; label: string }> = [
 ];
 
 function TabGlyph({ tab }: { tab: AppTab }) {
-  const props = {
-    viewBox: "0 0 24 24",
-    width: 22,
-    height: 22,
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.8,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-    "aria-hidden": true,
-  };
-  if (tab === "agent") return <svg {...props}><path d="M12 3v3M12 18v3M3 12h3M18 12h3" /><circle cx="12" cy="12" r="4" /></svg>;
-  if (tab === "files") return <svg {...props}><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2h7.5A2.5 2.5 0 0 1 21 9.5v8A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5v-10Z" /></svg>;
-  if (tab === "preview") return <svg {...props}><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.8 3.8 5.8 3.8 9S14.5 18.2 12 21c-2.5-2.8-3.8-5.8-3.8-9S9.5 5.8 12 3Z" /></svg>;
-  return <svg {...props}><rect x="3" y="4" width="18" height="16" rx="3" /><path d="m7 9 3 3-3 3M12 15h5" /></svg>;
+  if (tab === "agent") return <Play size={20} aria-hidden="true" />;
+  if (tab === "files") return <Folder size={20} aria-hidden="true" />;
+  if (tab === "preview") return <Eye size={20} aria-hidden="true" />;
+  return <Terminal size={20} aria-hidden="true" />;
 }
 
 export function MobileShell({
@@ -59,7 +54,11 @@ export function MobileShell({
   searchQuery,
   onSearchQueryChange,
   onSearch,
-  onQuickCreate,
+  onNewFile,
+  onNewFolder,
+  onImportZip,
+  onImportGithub,
+  onExportZip,
   notifications,
   settingsTab,
   onSettingsTabChange,
@@ -72,6 +71,7 @@ export function MobileShell({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [noticesOpen, setNoticesOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [actionsOpen, setActionsOpen] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem("mobile-agentic-ide:onboarding-seen") !== "true") setShowOnboarding(true);
@@ -91,7 +91,7 @@ export function MobileShell({
     <div className="ios-app-shell app-frame">
       <header className="top-command-bar">
         <button className="top-icon" type="button" aria-label="Device profile" aria-expanded={profileOpen} onClick={() => setProfileOpen((open) => !open)}>
-          <span aria-hidden="true">👤</span>
+          <User size={18} aria-hidden="true" />
         </button>
         <form className="top-search" onSubmit={submitSearch} role="search">
           <label className="sr-only" htmlFor="workspace-search">Search workspace or ask agent</label>
@@ -105,10 +105,10 @@ export function MobileShell({
           />
         </form>
         <button className="top-icon" type="button" aria-label="Open settings" onClick={() => { setNoticesOpen(false); setSettingsOpen(true); }}>
-          <span aria-hidden="true">⚙</span>
+          <Settings size={18} aria-hidden="true" />
         </button>
         <button className="top-icon" type="button" aria-label={`Notifications${notifications.length ? `, ${notifications.length} unread` : ""}`} onClick={() => setNoticesOpen((open) => !open)}>
-          <span aria-hidden="true">🔔</span>
+          <Bell size={18} aria-hidden="true" />
           {notifications.length > 0 && <span className="notice-count">{notifications.length}</span>}
         </button>
         {profileOpen && <p className="command-popover">This profile stays on this device. No account is connected.</p>}
@@ -126,8 +126,8 @@ export function MobileShell({
 
       <main className="app-scroll">{children}</main>
 
-      <button className="fab-create" type="button" onClick={onQuickCreate} aria-label="Create a file or project">
-        +
+      <button className="fab-create" type="button" onClick={() => setActionsOpen(true)} aria-label="Create a file or project">
+        <Plus size={24} />
       </button>
 
       <nav className="ios-tab-bar" aria-label="Primary navigation">
@@ -148,6 +148,15 @@ export function MobileShell({
         })}
       </nav>
 
+      <QuickActionSheet
+        open={actionsOpen}
+        onClose={() => setActionsOpen(false)}
+        onNewFile={onNewFile}
+        onNewFolder={onNewFolder}
+        onImportZip={onImportZip}
+        onImportGithub={onImportGithub}
+        onExportZip={onExportZip}
+      />
       <SettingsSheet
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
