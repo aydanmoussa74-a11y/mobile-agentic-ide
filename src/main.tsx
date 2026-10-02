@@ -40,11 +40,25 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
 
 const root = document.getElementById("root");
 if (root) {
-  createRoot(root).render(
-    <StrictMode>
-      <ErrorBoundary>
-        {renderRoute()}
-      </ErrorBoundary>
-    </StrictMode>,
-  );
+  try {
+    createRoot(root).render(
+      <StrictMode>
+        <ErrorBoundary>
+          {renderRoute()}
+        </ErrorBoundary>
+      </StrictMode>,
+    );
+  } catch (error) {
+    // Clear loading indicator and show exact error
+    root.innerHTML = `
+      <pre style="color:#f87171; padding:20px; white-space:pre-wrap; background:#1a1a1a; font-family:sans-serif; line-height:1.5;">
+TOP-LEVEL MOUNT ERROR:
+${error instanceof Error ? error.message : String(error)}
+
+Stack:
+${error instanceof Error ? error.stack || 'No stack trace' : 'No stack trace'}
+      </pre>
+    `;
+    console.error("Top-level mount failure:", error);
+  }
 }
