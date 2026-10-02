@@ -29,31 +29,31 @@ function OverflowMenu({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="ios-overflow-menu">
+    <div className="overflow-menu">
       <button 
-        className="ios-overflow-button" 
+        className="overflow-menu-button icon-button" 
         type="button" 
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Open global actions"
       >
-        <span className="ios-overflow-icon" aria-hidden="true">...</span>
+        <span aria-hidden="true">...</span>
       </button>
       {isOpen && (
-        <div className="ios-overflow-dropdown">
-          <button className="ios-overflow-item" type="button" onClick={onImportZip}>
-            <span className="ios-overflow-icon">IMP</span> Import ZIP
+        <div className="overflow-menu-dropdown">
+          <button className="overflow-menu-item" type="button" onClick={onImportZip}>
+            Import ZIP
           </button>
-          <button className="ios-overflow-item" type="button" onClick={onExportZip}>
-            <span className="ios-overflow-icon">EXP</span> Export ZIP
+          <button className="overflow-menu-item" type="button" onClick={onExportZip}>
+            Export ZIP
           </button>
-          <button className="ios-overflow-item" type="button" onClick={onHandover}>
-            <span className="ios-overflow-icon">HO</span> One-Tap Handover
+          <button className="overflow-menu-item" type="button" onClick={onHandover}>
+            One-Tap Handover
           </button>
-          <button className="ios-overflow-item" type="button" onClick={onRestoreCheckpoint}>
-            <span className="ios-overflow-icon">REST</span> Restore Checkpoint
+          <button className="overflow-menu-item" type="button" onClick={onRestoreCheckpoint}>
+            Checkpoint Restore
           </button>
-          <button className="ios-overflow-item" type="button" onClick={onOpenVault}>
-            <span className="ios-overflow-icon">VAULT</span> Secret Vault
+          <button className="overflow-menu-item" type="button" onClick={onOpenVault}>
+            Secret Vault
           </button>
         </div>
       )}
@@ -62,8 +62,8 @@ function OverflowMenu({
 }
 
 function HeaderStatus() {
-  const [storageInfo, setStorageInfo] = useState<{ usage: string; quota: string; ratio: number }>(
-    { usage: "0", quota: "0", ratio: 0 }
+  const [storageInfo, setStorageInfo] = useState<{ usage: string; quota: string; available: boolean }>(
+    { usage: "0", quota: "0", available: false }
   );
   const [offlineStatus, setOfflineStatus] = useState<"online" | "offline">("online");
   const [projectInfo, setProjectInfo] = useState<{ name: string; capabilities: string[] }>(
@@ -77,16 +77,13 @@ function HeaderStatus() {
     async function updateStorageInfo() {
       try {
         const estimate: StorageEstimate = await storageManager.estimate();
-        const usage = estimate.usageBytes || 0;
-        const quota = estimate.quotaBytes || 1;
-        const ratio = (usage / quota) * 100;
         setStorageInfo({
-          usage: formatBytes(usage),
-          quota: formatBytes(quota),
-          ratio: Math.round(ratio),
+          usage: formatBytes(estimate.usageBytes || 0),
+          quota: formatBytes(estimate.quotaBytes || 0),
+          available: estimate.available,
         });
       } catch {
-        setStorageInfo({ usage: "N/A", quota: "N/A", ratio: 0 });
+        setStorageInfo({ usage: "N/A", quota: "N/A", available: false });
       }
     }
 
@@ -138,35 +135,31 @@ function HeaderStatus() {
   }, []);
 
   return (
-    <div className="ios-header-status">
-      <div className={`ios-status-pill ${offlineStatus}`}>
-        <span className="ios-status-pill-icon">
+    <div className="header-status">
+      <div className="status-badge">
+        <span className="status-badge-icon">DISK</span>
+        <span className="status-badge-text">
+          {storageInfo.usage} / {storageInfo.quota}
+        </span>
+      </div>
+
+      <div className="status-badge">
+        <span className="status-badge-icon">
           {offlineStatus === "online" ? "ONLINE" : "OFFLINE"}
         </span>
-        <span className="ios-status-pill-text">
+        <span className="status-badge-text">
           {offlineStatus === "online" ? "Online" : "Offline"}
         </span>
       </div>
 
-      <div className="ios-status-pill">
-        <span className="ios-status-pill-icon">DISK</span>
-        <span className="ios-status-pill-text">{storageInfo.usage}</span>
-        <div className="ios-status-pill-bar">
-          <div 
-            className="ios-status-pill-bar-fill" 
-            style={{ width: `${Math.min(storageInfo.ratio, 100)}%` }}
-          />
-        </div>
-      </div>
-
       {projectInfo.name !== "No project" && (
-        <div className="ios-status-pill project-pill">
-          <span className="ios-status-pill-text">{projectInfo.name}</span>
+        <div className="status-badge project-badge">
+          <span className="status-badge-text">{projectInfo.name}</span>
           {projectInfo.capabilities.length > 0 && (
-            <div className="ios-capability-badges">
-              {projectInfo.capabilities.slice(0, 2).map(cap => (
-                <span key={cap} className={`ios-capability-badge ${cap}`}>
-                  {cap === "browser-native" ? "Web" : "Wasm"}
+            <div className="capability-badges-mini">
+              {projectInfo.capabilities.map(cap => (
+                <span key={cap} className={`capability-badge ${cap}`}>
+                  {cap}
                 </span>
               ))}
             </div>
@@ -174,9 +167,9 @@ function HeaderStatus() {
         </div>
       )}
 
-      <div className="ios-status-pill">
-        <span className="ios-status-pill-icon">{branchInfo.name}</span>
-        <span className="ios-status-pill-text">{branchInfo.snapshotCount} snap</span>
+      <div className="status-badge">
+        <span className="status-badge-icon">{branchInfo.name}</span>
+        <span className="status-badge-text">{branchInfo.snapshotCount} snapshots</span>
       </div>
     </div>
   );
@@ -232,14 +225,18 @@ export function MobileShell({ children, activeTab, onNavigate }: MobileShellProp
   };
 
   return (
-    <div className="ios-app-shell">
-      <header className="ios-nav-bar">
-        <div className="ios-nav-left">
-          <h1 className="ios-nav-title">Mobile IDE</h1>
+    <div className="app-shell">
+      <header className="top-bar">
+        <div className="top-bar-left">
+          <p className="eyebrow">Mobile-first workspace</p>
+          <h1>Agentic IDE</h1>
         </div>
 
-        <div className="ios-nav-right">
+        <div className="top-bar-center">
           <HeaderStatus />
+        </div>
+
+        <div className="top-bar-right">
           <OverflowMenu
             onImportZip={handleImportZip}
             onExportZip={handleExportZip}
@@ -250,54 +247,54 @@ export function MobileShell({ children, activeTab, onNavigate }: MobileShellProp
         </div>
       </header>
 
-      <main className="ios-main-surface">{children}</main>
+      <main className="main-surface">{children}</main>
 
-      <nav className="ios-tab-bar" aria-label="Primary navigation">
-        <button 
-          className={`ios-tab-item${activeTab === "workspace" ? " ios-tab-item-active" : ""}`} 
+      <nav className="bottom-nav" aria-label="Primary navigation">
+        <a 
+          className={`nav-item${activeTab === "workspace" ? " nav-item-active" : ""}`} 
+          href="#workspace" 
           aria-current={activeTab === "workspace" ? "page" : undefined} 
           onClick={() => onNavigate("workspace")}
-          type="button"
         >
-          <span className="ios-tab-icon" aria-hidden="true">📁</span>
-          <span className="ios-tab-label">Workspace</span>
-        </button>
-        <button 
-          className={`ios-tab-item${activeTab === "terminal" ? " ios-tab-item-active" : ""}`} 
+          <span aria-hidden="true">W</span>
+          <span>Workspace</span>
+        </a>
+        <a 
+          className={`nav-item${activeTab === "terminal" ? " nav-item-active" : ""}`} 
+          href="#terminal" 
           aria-current={activeTab === "terminal" ? "page" : undefined} 
           onClick={() => onNavigate("terminal")}
-          type="button"
         >
-          <span className="ios-tab-icon" aria-hidden="true">💻</span>
-          <span className="ios-tab-label">Terminal</span>
-        </button>
-        <button 
-          className={`ios-tab-item${activeTab === "preview" ? " ios-tab-item-active" : ""}`} 
+          <span aria-hidden="true">T</span>
+          <span>Terminal</span>
+        </a>
+        <a 
+          className={`nav-item${activeTab === "preview" ? " nav-item-active" : ""}`} 
+          href="#preview" 
           aria-current={activeTab === "preview" ? "page" : undefined} 
           onClick={() => onNavigate("preview")}
-          type="button"
         >
-          <span className="ios-tab-icon" aria-hidden="true">🌐</span>
-          <span className="ios-tab-label">Preview</span>
-        </button>
-        <button 
-          className={`ios-tab-item${activeTab === "handoff" ? " ios-tab-item-active" : ""}`} 
+          <span aria-hidden="true">P</span>
+          <span>Preview</span>
+        </a>
+        <a 
+          className={`nav-item${activeTab === "handoff" ? " nav-item-active" : ""}`} 
+          href="#handoff" 
           aria-current={activeTab === "handoff" ? "page" : undefined} 
           onClick={() => onNavigate("handoff")}
-          type="button"
         >
-          <span className="ios-tab-icon" aria-hidden="true">📊</span>
-          <span className="ios-tab-label">Ledger</span>
-        </button>
-        <button 
-          className={`ios-tab-item${activeTab === "mcp" ? " ios-tab-item-active" : ""}`} 
+          <span aria-hidden="true">L</span>
+          <span>Ledger</span>
+        </a>
+        <a 
+          className={`nav-item${activeTab === "mcp" ? " nav-item-active" : ""}`} 
+          href="#mcp" 
           aria-current={activeTab === "mcp" ? "page" : undefined} 
           onClick={() => onNavigate("mcp")}
-          type="button"
         >
-          <span className="ios-tab-icon" aria-hidden="true">🔗</span>
-          <span className="ios-tab-label">MCP</span>
-        </button>
+          <span aria-hidden="true">M</span>
+          <span>MCP</span>
+        </a>
       </nav>
 
       <FirstRunOnboarding
@@ -314,5 +311,5 @@ function formatBytes(bytes: number): string {
   const k = 1024;
   const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 }
