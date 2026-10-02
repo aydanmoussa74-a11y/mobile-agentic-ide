@@ -2,8 +2,8 @@
   "project_name": "mobile-agentic-ide",
   "version": "0.1.0-alpha",
   "active_agent": "Manus (GitHub Pages Deployment, Code Editor Upgrade, Real-Time Streaming)",
-  "last_updated": "2026-10-01T22:00:00Z",
-  "current_phase": "Phase 4: Deployment & Streaming",
+  "last_updated": "2026-10-02T22:30:00Z",
+  "current_phase": "Phase 4: Consumer landing and settings",
   "completed_tasks": [
     "Read AGENTS.md and the existing .agent_state.json before modifying code",
     "Reviewed odysseus-dev/odysseus as structural inspiration for chat, agents, tools, and workspace boundaries",
@@ -122,14 +122,14 @@
     "Enhanced AgentActivityDrawer.tsx with streaming display panel showing live token chunks, streaming status, sequence ID, and chunk count",
     "Added \"streaming\" phase to AgentPhase type for real-time token streaming visualization",
     "Updated agent/index.ts to export streaming handover utilities (streamingHandover, createStreamingHandoverPayload, createStreamingDisplay, formatStreamingChunk)",
-    "Preserved all DLP scanning and safety checks in streaming implementation"
+    "Preserved all DLP scanning and safety checks in streaming implementation",
+    "Task 30: replaced the status-pill header with a profile, universal search, settings, and notifications command bar; moved provider keys, ledger, MCP relays, and system status into a slide-up Settings sheet; added quick-start templates, recent IndexedDB files, and a floating create button; reduced the bottom bar to Agent, Files, Preview, and Terminal"
   ],
-  "current_active_task": "Task 22 complete: GitHub Pages Deployment, Code Editor Upgrade to syntax-highlighted editor, and Real-Time Agent Token Streaming",
+  "current_active_task": "Task 30 complete: consumer landing dashboard, command bar, and settings sheet",
   "next_steps": [
     "Add focused orchestration, tool-call, terminal, preview, testing, and UI tests",
     "Move model calls behind a trusted backend before production use of API keys",
-    "Add streaming agent feedback in a later task",
-    "Add session history persistence and richer code-diff capture"
+    "Persist a multi-project workspace index instead of treating the single VFS as one project"
   ],
   "baseline_notes": {
     "reference_adaptation": "Odysseus workspace and agent concepts are retained as future boundaries, but the client shell is single-surface, touch-first, progressive-disclosure oriented, and intentionally lightweight for mobile PWA use.",
@@ -145,7 +145,7 @@
       "Streaming agent feedback",
       "Full code editor"
     ],
-    "review_checkpoint": "Task 22 complete: GitHub Pages deployment workflow configured, CodeEditor upgraded with syntax highlighting and keyboard shortcuts, Real-Time Agent Token Streaming implemented. All validation passed. Ready for live deployment at https://aydanmoussa74-a11y.github.io/mobile-agentic-ide/",
+    "review_checkpoint": "Task 30 complete: consumer landing screen and settings sheet. npm run check and npm run build passed.",
     "validation": {
       "npm_install": "passed",
       "type_check": "passed",
@@ -179,7 +179,9 @@
       "task22_production_build": "passed",
       "task22_gh_pages_config": "configured",
       "task22_code_editor": "implemented",
-      "task22_streaming": "implemented"
+      "task22_streaming": "implemented",
+      "task30_type_check": "passed",
+      "task30_production_build": "passed"
     }
   }
 }

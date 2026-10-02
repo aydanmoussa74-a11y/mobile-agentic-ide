@@ -5,4 +5,5 @@ export { Workspace, type WorkspaceProps } from "./Workspace";
 export { CodeEditor, type CodeEditorProps } from "./CodeEditor";
 export { AgentActivityDrawer, type AgentActivityDrawerProps, type AgentActivity, type AgentPhase } from "./AgentActivityDrawer";
 export { VisualDiffModal, type VisualDiffProps, type DiffHunk } from "./VisualDiffModal";
-export { Ledger, type LedgerProps } from "./Ledger";
+export { SettingsSheet, type SettingsTab } from "./SettingsSheet";
+export { LandingDashboard, type StarterTemplate } from "./LandingDashboard";
