@@ -18,6 +18,17 @@
     <div id="root">
       <div style="color: white; text-align: center; padding-top: 100px;">Loading Mobile IDE...</div>
     </div>
+    <script>
+      window.onerror = function(msg, url, line) {
+        document.getElementById('root').innerHTML =
+          '<div style="color:red; background:#18181b; padding:20px; font-family:monospace;">' +
+          '<h3>SCRIPT LOAD ERROR</h3>' +
+          '<p>' + msg + '</p>' +
+          '<p>URL: ' + url + '</p>' +
+          '<p>Line: ' + line + '</p>' +
+          '</div>';
+      };
+    </script>
     <script type="module" src="/mobile-agentic-ide/src/main.tsx"></script>
   </body>
 </html>
