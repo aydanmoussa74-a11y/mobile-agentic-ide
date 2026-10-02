@@ -135,10 +135,10 @@ export function Ledger({ files, activeProvider, activeModel, testLogs, onHandove
           <button className="ledger-section-toggle" type="button" onClick={() => setShowPayloadPreview(!showPayloadPreview)}>{showPayloadPreview ? "-" : "+"}</button>
         </div>
         <div className="payload-stats">
-          <div className="payload-stat"><span className="payload-stat-label">Raw Size:</span><span className="payload-stat-value">{formatBytes(payloadSize.raw)}</span></div>
-          <div className="payload-stat"><span className="payload-stat-label">Compressed:</span><span className="payload-stat-value">{formatBytes(payloadSize.compressed)}</span></div>
-          <div className="payload-stat"><span className="payload-stat-label">Files:</span><span className="payload-stat-value">{files.length}</span></div>
-          <div className="payload-stat"><span className="payload-stat-label">Logs:</span><span className="payload-stat-value">{testLogs.length}</span></div>
+          <div className="payload-stat meta-row"><span className="payload-stat-label">Raw Size:</span><span className="payload-stat-value">{formatBytes(payloadSize.raw)}</span></div>
+          <div className="payload-stat meta-row"><span className="payload-stat-label">Compressed:</span><span className="payload-stat-value">{formatBytes(payloadSize.compressed)}</span></div>
+          <div className="payload-stat meta-row"><span className="payload-stat-label">Files:</span><span className="payload-stat-value">{files.length}</span></div>
+          <div className="payload-stat meta-row"><span className="payload-stat-label">Logs:</span><span className="payload-stat-value">{testLogs.length}</span></div>
         </div>
         {showPayloadPreview && payloadPreview && (
           <div className="payload-preview">
@@ -151,8 +151,8 @@ export function Ledger({ files, activeProvider, activeModel, testLogs, onHandove
       <div className="ledger-section provider-section">
         <h3><span className="ledger-section-icon">PROV</span> Active Provider</h3>
         <div className="provider-info">
-          <div className="provider-field"><span className="provider-field-label">Provider:</span><span className="provider-field-value">{activeProvider}</span></div>
-          <div className="provider-field"><span className="provider-field-label">Model:</span><span className="provider-field-value">{activeModel}</span></div>
+          <div className="provider-field meta-row"><span className="provider-field-label">Provider:</span><span className="provider-field-value">{activeProvider}</span></div>
+          <div className="provider-field meta-row"><span className="provider-field-label">Model:</span><span className="provider-field-value">{activeModel}</span></div>
         </div>
       </div>
 
