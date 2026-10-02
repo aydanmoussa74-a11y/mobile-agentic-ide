@@ -1,48 +1,11 @@
 import { StrictMode, Component, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { renderRoute } from "./app/routes";
-import { registerServiceWorker } from "./lib/pwa";
 import "./styles/index.css";
 
-// Cache purge before registering new service worker
-async function purgeOldCachesAndRegister(): Promise<void> {
-  // Unregister any existing service worker
-  const registrations = await navigator.serviceWorker.getRegistrations();
-  for (const registration of registrations) {
-    await registration.unregister();
-  }
-
-  // Delete all old caches
-  if (caches) {
-    const cacheKeys = await caches.keys();
-    for (const cacheKey of cacheKeys) {
-      await caches.delete(cacheKey);
-    }
-  }
-
-  // Check for old cache version and force hard reload
-  const currentVersion = "v2::2026-10-01";
-  const oldVersion = localStorage.getItem("sw-cache-version");
-  if (oldVersion && oldVersion !== currentVersion) {
-    localStorage.setItem("sw-cache-version", currentVersion);
-    window.location.reload();
-    return;
-  }
-  localStorage.setItem("sw-cache-version", currentVersion);
-
-  // Register new service worker
-  registerServiceWorker();
-}
-
-// Initialize cache purge and SW registration
-if ("serviceWorker" in navigator) {
-  purgeOldCachesAndRegister().catch(() => {
-    // Fallback: register normally if purge fails
-    registerServiceWorker();
-  });
-} else {
-  registerServiceWorker();
-}
+// Service Worker registration is disabled to debug GitHub Pages mounting issues
+// import { registerServiceWorker } from "./lib/pwa";
+// registerServiceWorker();
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
   constructor(props: { children: ReactNode }) {
