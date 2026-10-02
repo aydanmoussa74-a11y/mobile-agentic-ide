@@ -88,31 +88,29 @@ export function MobileShell({
   };
 
   return (
-    <div className="ios-app-shell">
-      <header className="ios-nav-bar command-bar">
-        <div className="command-bar-row">
-          <button className="command-icon" type="button" aria-label="Device profile" aria-expanded={profileOpen} onClick={() => setProfileOpen((open) => !open)}>
-            <span aria-hidden="true">👤</span>
-          </button>
-          <form className="command-search" onSubmit={submitSearch} role="search">
-            <label className="sr-only" htmlFor="workspace-search">Search workspace or ask agent</label>
-            <span className="command-prompt" aria-hidden="true">{">_"}</span>
-            <input
-              id="workspace-search"
-              value={searchQuery}
-              onChange={(event) => onSearchQueryChange(event.target.value)}
-              placeholder="Search workspace or ask agent..."
-              autoComplete="off"
-            />
-          </form>
-          <button className="command-icon" type="button" aria-label="Open settings" onClick={() => { setNoticesOpen(false); setSettingsOpen(true); }}>
-            <span aria-hidden="true">⚙</span>
-          </button>
-          <button className="command-icon" type="button" aria-label={`Notifications${notifications.length ? `, ${notifications.length} unread` : ""}`} onClick={() => setNoticesOpen((open) => !open)}>
-            <span aria-hidden="true">🔔</span>
-            {notifications.length > 0 && <span className="notice-count">{notifications.length}</span>}
-          </button>
-        </div>
+    <div className="ios-app-shell app-frame">
+      <header className="top-command-bar">
+        <button className="top-icon" type="button" aria-label="Device profile" aria-expanded={profileOpen} onClick={() => setProfileOpen((open) => !open)}>
+          <span aria-hidden="true">👤</span>
+        </button>
+        <form className="top-search" onSubmit={submitSearch} role="search">
+          <label className="sr-only" htmlFor="workspace-search">Search workspace or ask agent</label>
+          <span className="command-prompt" aria-hidden="true">{">_"}</span>
+          <input
+            id="workspace-search"
+            value={searchQuery}
+            onChange={(event) => onSearchQueryChange(event.target.value)}
+            placeholder="Search workspace or ask agent..."
+            autoComplete="off"
+          />
+        </form>
+        <button className="top-icon" type="button" aria-label="Open settings" onClick={() => { setNoticesOpen(false); setSettingsOpen(true); }}>
+          <span aria-hidden="true">⚙</span>
+        </button>
+        <button className="top-icon" type="button" aria-label={`Notifications${notifications.length ? `, ${notifications.length} unread` : ""}`} onClick={() => setNoticesOpen((open) => !open)}>
+          <span aria-hidden="true">🔔</span>
+          {notifications.length > 0 && <span className="notice-count">{notifications.length}</span>}
+        </button>
         {profileOpen && <p className="command-popover">This profile stays on this device. No account is connected.</p>}
         {noticesOpen && (
           <div className="notice-sheet" role="region" aria-label="Notifications">
@@ -126,7 +124,7 @@ export function MobileShell({
         )}
       </header>
 
-      <main className="ios-main-surface">{children}</main>
+      <main className="app-scroll">{children}</main>
 
       <button className="fab-create" type="button" onClick={onQuickCreate} aria-label="Create a file or project">
         +
