@@ -206,15 +206,6 @@ export function CodeEditor({ file, onChange, onSave, isSaved, readOnly = false, 
 
   return (
     <div className="code-editor">
-      <div className="editor-header">
-        <span className="editor-language">{detectedLanguage()}</span>
-        <div className="editor-stats">
-          <span className="editor-stat">{stats.lines} lines</span>
-          <span className="editor-stat">{stats.chars} chars</span>
-          <span className="editor-stat">{(stats.size / 1024).toFixed(1)} KB</span>
-        </div>
-      </div>
-
       <div className="editor-wrapper">
         {/* Line numbers */}
         <div className="editor-line-numbers">
@@ -240,12 +231,6 @@ export function CodeEditor({ file, onChange, onSave, isSaved, readOnly = false, 
           dangerouslySetInnerHTML={!readOnly ? undefined : { __html: highlightedHtml || "&nbsp;" }}
           data-placeholder={!readOnly ? "Start typing..." : undefined}
         />
-      </div>
-
-      <div className="editor-actions">
-        <button className="primary-button" type="button" onClick={onSave} disabled={isSaved}>
-          {isSaved ? "Saved" : "Save changes"}
-        </button>
       </div>
       <div className="quick-keys" aria-label="Symbol keys">
         {["{", "}", "[", "]", "(", ")", "<", ">", ";", "=", "/", "!"].map((symbol) => (
